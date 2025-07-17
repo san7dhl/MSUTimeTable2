@@ -159,14 +159,16 @@
             border-radius: 0.5rem;
             color: #9ca3af; /* gray-400 */
         }
-        select, input[type="text"], input[type="number"] {
+        select, input[type="text"], input[type="number"], textarea {
             background-color: #0f172a; /* slate-900 */
             border: 1px solid #334155; /* slate-700 */
             color: #cbd5e1; /* slate-300 */
+            border-radius: 0.375rem;
         }
-        select:focus, input:focus {
+        select:focus, input:focus, textarea:focus {
             --tw-ring-color: var(--main-color) !important;
             border-color: var(--main-color) !important;
+            outline: none;
         }
         option {
             background-color: #1e293b; /* slate-800 */
@@ -182,7 +184,26 @@
             border: 1px solid #334155 !important;
             color: #e5e7eb !important;
         }
-
+        .mode-button.active {
+            background-color: var(--main-color);
+            color: white;
+        }
+        .mode-button {
+             background-color: #334155; /* slate-700 */
+             color: #cbd5e1; /* slate-300 */
+        }
+        .bulk-form-row {
+            display: grid;
+            gap: 0.75rem;
+            align-items: center;
+            padding-bottom: 0.75rem;
+            margin-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .bulk-form-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
     </style>
 </head>
 <body class="text-gray-200">
@@ -214,17 +235,23 @@
 
         <main id="main-content">
             <div id="manage-view" class="hidden panel p-6">
-                 <h2 class="text-xl font-semibold mb-6 text-white">Data & Settings</h2>
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-semibold text-white">Data & Settings</h2>
+                    <div class="flex items-center space-x-2 p-1 bg-slate-900 rounded-lg">
+                        <button id="mode-individual-btn" class="mode-button active px-3 py-1 text-sm rounded-md transition-colors">Individual</button>
+                        <button id="mode-bulk-btn" class="mode-button px-3 py-1 text-sm rounded-md transition-colors">Bulk Edit</button>
+                    </div>
+                </div>
                  
                  <div class="bg-slate-900/50 p-4 rounded-lg border border-[--border-color] mb-8">
                    <h3 class="text-lg font-medium mb-3 text-white">Import & Export</h3>
-                   <p class="text-gray-400 mb-4 text-sm">Import data from a multi-sheet Excel file (`Programs`, `Courses`, `Faculty`). This is the recommended way to manage your data.</p>
+                   <p class="text-gray-400 mb-4 text-sm">You can import data from a multi-sheet Excel file or download all current data for backup or sharing.</p>
                    <div class="flex items-center space-x-4">
                         <input type="file" id="excel-file-input" accept=".xlsx, .xls" class="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-white/10 file:text-white hover:file:bg-white/20"/>
                         <button id="import-button" class="px-4 py-2 bg-[--main-color] text-white rounded-lg hover:bg-cyan-700 transition-colors flex-shrink-0" title="Import data from a multi-sheet Excel file. This will overwrite existing data.">Import Data</button>
                    </div>
                     <div class="mt-4 flex items-center space-x-4">
-                        <button id="download-template-btn" class="text-sm text-amber-400 hover:underline" title="Download a pre-formatted Excel file to use as a template for your data">Download Multi-Sheet Excel Template</button>
+                        <button id="download-current-data-btn" class="text-sm text-amber-400 hover:underline" title="Download all current data as a re-uploadable Excel file">Download All Data as Excel</button>
                     </div>
                  </div>
 
@@ -237,42 +264,84 @@
                    </div>
                  </div>
                  
-                 <p class="text-gray-300 mb-6">Add, edit, or delete programs, faculty, and courses directly.</p>
-                 <div class="space-y-12">
-                   <div class="mb-12">
+                <div id="individual-edit-view">
+                    <p class="text-gray-300 mb-6">Add, edit, or delete programs, faculty, and courses directly.</p>
+                    <div class="space-y-12">
+                       <div class="mb-12">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="text-lg font-medium text-white">Programs</h3>
+                                <button id="add-program-btn" class="px-3 py-1.5 bg-[--main-color] text-white text-sm rounded-lg hover:bg-cyan-700 transition-colors flex items-center gap-2" title="Add a new academic program">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                    Add Program
+                                </button>
+                            </div>
+                            <input type="text" id="program-search-input" placeholder="Search programs..." class="w-full mb-3 px-3 py-2 rounded-md">
+                            <div id="program-management-list" class="space-y-2 max-h-96 overflow-y-auto p-1"></div>
+                       </div>
+                       <div class="mb-12">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="text-lg font-medium text-white">Faculty Members</h3>
+                                <button id="add-faculty-btn" class="px-3 py-1.5 bg-[--main-color] text-white text-sm rounded-lg hover:bg-cyan-700 transition-colors flex items-center gap-2" title="Add a new faculty member">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                    Add Faculty
+                                </button>
+                            </div>
+                            <input type="text" id="faculty-search-input" placeholder="Search faculty..." class="w-full mb-3 px-3 py-2 rounded-md">
+                            <div id="faculty-management-list" class="space-y-2 max-h-96 overflow-y-auto p-1"></div>
+                       </div>
+                       <div>
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="text-lg font-medium text-white">Courses</h3>
+                                 <button id="add-course-btn" class="px-3 py-1.5 bg-[--main-color] text-white text-sm rounded-lg hover:bg-cyan-700 transition-colors flex items-center gap-2" title="Add a new course">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                    Add Course
+                                </button>
+                            </div>
+                            <input type="text" id="course-search-input" placeholder="Search courses..." class="w-full mb-3 px-3 py-2 rounded-md">
+                            <div id="course-management-list" class="space-y-2 max-h-96 overflow-y-auto p-1"></div>
+                       </div>
+                    </div>
+                </div>
+
+                <div id="bulk-edit-view" class="hidden space-y-8">
+                    <!-- Departments Section -->
+                    <div class="p-4 bg-slate-900/50 rounded-lg">
+                        <h3 class="text-lg font-medium text-white mb-2">1. Departments</h3>
+                        <p class="text-sm text-gray-400 mb-2">Enter one department name per line. These will be available in dropdowns below.</p>
+                        <textarea id="bulk-departments-textarea" class="w-full h-24 p-2 rounded-md font-mono text-sm" placeholder="School of Computer Science&#10;School of Engineering"></textarea>
+                    </div>
+
+                    <!-- Programs Section -->
+                    <div class="p-4 bg-slate-900/50 rounded-lg">
                         <div class="flex justify-between items-center mb-3">
-                            <h3 class="text-lg font-medium text-white">Programs</h3>
-                            <button id="add-program-btn" class="px-3 py-1.5 bg-[--main-color] text-white text-sm rounded-lg hover:bg-cyan-700 transition-colors flex items-center gap-2" title="Add a new academic program">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                Add Program
-                            </button>
+                            <h3 class="text-lg font-medium text-white">2. Programs</h3>
+                            <button id="bulk-add-program-btn" class="px-3 py-1.5 bg-slate-600 text-white text-sm rounded-lg hover:bg-slate-700 transition-colors">Add Program Row</button>
                         </div>
-                        <input type="text" id="program-search-input" placeholder="Search programs..." class="w-full mb-3 px-3 py-2 rounded-md">
-                        <div id="program-management-list" class="space-y-2 max-h-96 overflow-y-auto p-1"></div>
-                   </div>
-                   <div class="mb-12">
+                        <div id="bulk-programs-list" class="space-y-3"></div>
+                    </div>
+
+                    <!-- Faculty Section -->
+                    <div class="p-4 bg-slate-900/50 rounded-lg">
                         <div class="flex justify-between items-center mb-3">
-                            <h3 class="text-lg font-medium text-white">Faculty Members</h3>
-                            <button id="add-faculty-btn" class="px-3 py-1.5 bg-[--main-color] text-white text-sm rounded-lg hover:bg-cyan-700 transition-colors flex items-center gap-2" title="Add a new faculty member">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                Add Faculty
-                            </button>
+                            <h3 class="text-lg font-medium text-white">3. Faculty</h3>
+                            <button id="bulk-add-faculty-btn" class="px-3 py-1.5 bg-slate-600 text-white text-sm rounded-lg hover:bg-slate-700 transition-colors">Add Faculty Row</button>
                         </div>
-                        <input type="text" id="faculty-search-input" placeholder="Search faculty..." class="w-full mb-3 px-3 py-2 rounded-md">
-                        <div id="faculty-management-list" class="space-y-2 max-h-96 overflow-y-auto p-1"></div>
-                   </div>
-                   <div>
+                        <div id="bulk-faculty-list" class="space-y-3"></div>
+                    </div>
+
+                    <!-- Courses Section -->
+                    <div class="p-4 bg-slate-900/50 rounded-lg">
                         <div class="flex justify-between items-center mb-3">
-                            <h3 class="text-lg font-medium text-white">Courses</h3>
-                             <button id="add-course-btn" class="px-3 py-1.5 bg-[--main-color] text-white text-sm rounded-lg hover:bg-cyan-700 transition-colors flex items-center gap-2" title="Add a new course">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                Add Course
-                            </button>
+                            <h3 class="text-lg font-medium text-white">4. Courses</h3>
+                            <button id="bulk-add-course-btn" class="px-3 py-1.5 bg-slate-600 text-white text-sm rounded-lg hover:bg-slate-700 transition-colors">Add Course Row</button>
                         </div>
-                        <input type="text" id="course-search-input" placeholder="Search courses..." class="w-full mb-3 px-3 py-2 rounded-md">
-                        <div id="course-management-list" class="space-y-2 max-h-96 overflow-y-auto p-1"></div>
-                   </div>
-                 </div>
+                        <div id="bulk-courses-list" class="space-y-3"></div>
+                    </div>
+
+                    <div class="text-right mt-8">
+                        <button id="save-bulk-data-btn" class="px-6 py-2 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 transition-colors">Save All Bulk Changes</button>
+                    </div>
+                </div>
             </div>
 
             <div id="group-view">
@@ -361,6 +430,7 @@
                     </div>
                 </div>
             </div>
+
         </main>
 
         <footer class="text-center text-sm text-gray-400 mt-8 py-4 border-t border-white/10">
@@ -382,7 +452,7 @@
         
         let db, auth;
         let unsubscribe;
-        let currentAppId; // Store the app ID globally within the module
+        let currentAppId;
 
         const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
         const periods = [
@@ -393,7 +463,7 @@
         ];
         const colorPalette = ['#22d3ee', '#a3e635', '#f87171', '#fb923c', '#a78bfa', '#f472b6', '#34d399', '#fbbf24'];
         const courseColors = {};
-        const ACCENT_COLOR_HEX = "E09511"; // From CSS var --accent-color: #E09511;
+        const ACCENT_COLOR_HEX = "E09511";
 
         const LUNCH_PERIODS = {
             default: 5,
@@ -418,6 +488,7 @@
             initialEmptyState: document.getElementById('initial-empty-state'),
             groupViewContent: document.getElementById('group-view-content'),
             manage: {
+                individualEditView: document.getElementById('individual-edit-view'),
                 programList: document.getElementById('program-management-list'),
                 addProgramBtn: document.getElementById('add-program-btn'),
                 programSearch: document.getElementById('program-search-input'),
@@ -428,6 +499,19 @@
                 addCourseBtn: document.getElementById('add-course-btn'),
                 courseSearch: document.getElementById('course-search-input'),
                 workloadLimitInput: document.getElementById('workload-limit-input'),
+                
+                bulkEditView: document.getElementById('bulk-edit-view'),
+                modeIndividualBtn: document.getElementById('mode-individual-btn'),
+                modeBulkBtn: document.getElementById('mode-bulk-btn'),
+                
+                bulkDepartmentsTextarea: document.getElementById('bulk-departments-textarea'),
+                bulkProgramsList: document.getElementById('bulk-programs-list'),
+                bulkAddProgramBtn: document.getElementById('bulk-add-program-btn'),
+                bulkFacultyList: document.getElementById('bulk-faculty-list'),
+                bulkAddFacultyBtn: document.getElementById('bulk-add-faculty-btn'),
+                bulkCoursesList: document.getElementById('bulk-courses-list'),
+                bulkAddCourseBtn: document.getElementById('bulk-add-course-btn'),
+                saveBulkDataBtn: document.getElementById('save-bulk-data-btn'),
             }
         };
 
@@ -442,6 +526,16 @@
             return [...depts].filter(Boolean).sort();
         }
 
+        function debounce(func, delay = 300) {
+            let timeout;
+            return (...args) => {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => {
+                    func.apply(this, args);
+                }, delay);
+            };
+        }
+
         // --- INITIALIZATION ---
         window.onload = () => {
             initEventListeners();
@@ -450,7 +544,6 @@
         };
 
         async function initFirebase() {
-            // This public configuration is for demonstration purposes.
             const firebaseConfig = {
                 apiKey: "AIzaSyAujuoVJ92uCYwoH5wSdhgOb6xHunbQuHA",
                 authDomain: "mytimetabletool.firebaseapp.com",
@@ -461,26 +554,21 @@
                 measurementId: "G-B1H5VE5Z2B"
             };
 
-            // Handle the workspace ID from the URL for collaboration.
             const urlParams = new URLSearchParams(window.location.search);
             let appId = urlParams.get('appId');
 
-            // If no appId is found in the URL, generate one and reload the page with it.
             if (!appId) {
-                appId = crypto.randomUUID(); // Generate a unique ID for a new workspace.
-                // This reloads the page, ensuring the new URL is shareable.
+                appId = crypto.randomUUID();
                 window.location.href = `${window.location.pathname}?appId=${appId}`;
-                return; // Stop execution until the page reloads with the new URL.
+                return; 
             }
             currentAppId = appId;
             document.getElementById('user-id-display').textContent = currentAppId;
 
-            // Initialize Firebase services.
             const app = initializeApp(firebaseConfig);
             db = getFirestore(app);
             auth = getAuth(app);
             
-            // Sign in the user anonymously and then start listening for data changes.
             try {
                 await signInAnonymously(auth);
                 console.log("Signed in anonymously.");
@@ -493,16 +581,14 @@
         
         function listenForDataChanges(appId) {
             const dbRef = doc(db, "artifacts", appId, "public", "data");
-            if (unsubscribe) unsubscribe(); // Stop listening to previous document if any
+            if (unsubscribe) unsubscribe();
 
             unsubscribe = onSnapshot(dbRef, (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
-                    // Merge with defaults to ensure all keys exist
                     DB = { ...{ departments: [], programs: [], faculty: [], courses: [], schedule: {}, workloadLimit: 20 }, ...data };
-                    if(!DB.departments) DB.departments = []; // Backwards compatibility for old data structures
+                    if(!DB.departments) DB.departments = [];
                 } else {
-                    // This is a new document, initialize with default empty state
                     console.log("No data found for this workspace. Initializing with empty state.");
                     DB = { departments: [], programs: [], faculty: [], courses: [], schedule: {}, workloadLimit: 20 };
                 }
@@ -519,7 +605,7 @@
                 if (e.target.tagName === 'BUTTON') showView(e.target.dataset.view);
             });
             document.getElementById('import-button').addEventListener('click', handleImport);
-            document.getElementById('download-template-btn').addEventListener('click', downloadTemplate);
+            document.getElementById('download-current-data-btn').addEventListener('click', exportCurrentDataAsExcel);
             document.getElementById('export-timetable-workbook-btn').addEventListener('click', exportTimetableWorkbook);
             document.getElementById('export-faculty-workbook-btn').addEventListener('click', exportFacultyWorkbook);
             document.getElementById('print-btn').addEventListener('click', () => printTimetable('group'));
@@ -530,7 +616,7 @@
             document.getElementById('empty-state-import-btn').addEventListener('click', () => showView('manage'));
             
             document.getElementById('share-btn').addEventListener('click', () => {
-                 const shareUrl = window.location.href; // This will have the correct appId in the environment
+                 const shareUrl = window.location.href;
                  Swal.fire({
                        title: 'Share Workspace',
                        html: `Share this URL with your colleagues to collaborate:<br><br><input type="text" value="${shareUrl}" class="swal2-input" readonly>`,
@@ -559,6 +645,7 @@
             dom.timetableGrid.addEventListener('dragleave', handleDragLeave);
             dom.timetableGrid.addEventListener('drop', handleDrop);
 
+            // Manage View Listeners
             dom.manage.addProgramBtn.addEventListener('click', handleAddProgram);
             dom.manage.programSearch.addEventListener('input', () => renderManageView());
             dom.manage.addFacultyBtn.addEventListener('click', handleAddFaculty);
@@ -566,6 +653,18 @@
             dom.manage.addCourseBtn.addEventListener('click', handleAddCourse);
             dom.manage.courseSearch.addEventListener('input', () => renderManageView());
             dom.manage.workloadLimitInput.addEventListener('change', handleWorkloadLimitChange);
+            dom.manage.modeIndividualBtn.addEventListener('click', () => toggleEditMode('individual'));
+            dom.manage.modeBulkBtn.addEventListener('click', () => toggleEditMode('bulk'));
+            dom.manage.saveBulkDataBtn.addEventListener('click', handleSaveBulkData);
+            
+            // Bulk Edit Listeners
+            const debouncedUpdate = debounce(updateBulkFormDropdowns, 500);
+            dom.manage.bulkDepartmentsTextarea.addEventListener('input', debouncedUpdate);
+            dom.manage.bulkProgramsList.addEventListener('input', debouncedUpdate);
+            dom.manage.bulkFacultyList.addEventListener('input', debouncedUpdate);
+            dom.manage.bulkAddProgramBtn.addEventListener('click', () => addBulkProgramRow());
+            dom.manage.bulkAddFacultyBtn.addEventListener('click', () => addBulkFacultyRow());
+            dom.manage.bulkAddCourseBtn.addEventListener('click', () => addBulkCourseRow());
         }
 
         async function saveState() { 
@@ -577,7 +676,6 @@
             
             const dbRef = doc(db, "artifacts", currentAppId, "public", "data");
             try {
-                // Update departments before saving
                 DB.departments = getUniqueDepartments().map(d => ({ departmentName: d }));
                 await setDoc(dbRef, DB);
                 console.log("State saved to Firestore.");
@@ -614,7 +712,6 @@
         function renderAll() {
             renderGroupView(); 
             renderFacultyView();
-            // Only render the manage view if it's currently visible to avoid unnecessary computation
             if(document.getElementById('manage-view').offsetParent !== null) {
                 renderManageView();
             }
@@ -796,7 +893,6 @@
             const effectiveSchedule = getEffectiveScheduleForGroup(selectedGroup.program, selectedGroup.semester);
             const lunchPeriod = LUNCH_PERIODS[selectedGroup.semester] || LUNCH_PERIODS.default;
             
-            // Get all programs in the current view's hierarchy (self + parents)
             const currentProgram = DB.programs.find(p => p.programName === selectedGroup.program);
             const programsInHierarchy = currentProgram ? [currentProgram.programName, ...(currentProgram.parentPrograms || [])] : [];
             const uniqueHierarchy = [...new Set(programsInHierarchy)];
@@ -813,7 +909,6 @@
                     slot.dataset.day = day;
                     slot.dataset.period = period.number;
 
-                    // MODIFICATION: Check if any non-excluded program in the hierarchy has a fixed block
                     let fixedBlock = null;
                     for (const progName of uniqueHierarchy) {
                         const isExcluded = progName.toLowerCase().includes('dce') || progName.toLowerCase().includes('btech');
@@ -825,7 +920,7 @@
                             );
                             if (block) {
                                 fixedBlock = block;
-                                break; // Found a block, no need to check further
+                                break;
                             }
                         }
                     }
@@ -834,7 +929,7 @@
                         slot.classList.add('fixed-block');
                         slot.innerHTML = `<div class="scheduled-item flex items-center justify-center"><span class="course-name">${fixedBlock.label}</span></div>`;
                         dom.timetableGrid.appendChild(slot);
-                        return; // Replaces continue for forEach
+                        return;
                     }
 
                     if (period.number === lunchPeriod) {
@@ -993,7 +1088,7 @@
         function renderManageView() {
             dom.manage.workloadLimitInput.value = DB.workloadLimit;
 
-            // Render Programs
+            // Individual Programs
             const programSearchTerm = dom.manage.programSearch.value.toLowerCase();
             const filteredPrograms = DB.programs.filter(p => p.programName.toLowerCase().includes(programSearchTerm));
             dom.manage.programList.innerHTML = '';
@@ -1022,7 +1117,7 @@
                 });
             }
 
-            // Render Faculty
+            // Individual Faculty
             const facultySearchTerm = dom.manage.facultySearch.value.toLowerCase();
             const filteredFaculty = DB.faculty.filter(f => f.facultyName.toLowerCase().includes(facultySearchTerm));
             dom.manage.facultyList.innerHTML = '';
@@ -1050,7 +1145,7 @@
                 });
             }
 
-            // Render Courses
+            // Individual Courses
             const courseSearchTerm = dom.manage.courseSearch.value.toLowerCase();
             const filteredCourses = DB.courses.filter(c => c.courseName.toLowerCase().includes(courseSearchTerm));
             dom.manage.courseList.innerHTML = '';
@@ -1078,6 +1173,169 @@
                     item.querySelector('.bg-red-600').addEventListener('click', () => handleDeleteCourse(index));
                     dom.manage.courseList.appendChild(item);
                 });
+            }
+        }
+
+        function toggleEditMode(mode) {
+            if (mode === 'bulk') {
+                dom.manage.individualEditView.classList.add('hidden');
+                dom.manage.bulkEditView.classList.remove('hidden');
+                dom.manage.modeBulkBtn.classList.add('active');
+                dom.manage.modeIndividualBtn.classList.remove('active');
+                renderBulkEditForms();
+            } else { // individual
+                dom.manage.individualEditView.classList.remove('hidden');
+                dom.manage.bulkEditView.classList.add('hidden');
+                dom.manage.modeIndividualBtn.classList.add('active');
+                dom.manage.modeBulkBtn.classList.remove('active');
+                renderManageView();
+            }
+        }
+
+        function renderBulkEditForms() {
+            dom.manage.bulkDepartmentsTextarea.value = getUniqueDepartments().join('\n');
+            
+            dom.manage.bulkProgramsList.innerHTML = '';
+            DB.programs.forEach(p => addBulkProgramRow(p));
+
+            dom.manage.bulkFacultyList.innerHTML = '';
+            DB.faculty.forEach(f => addBulkFacultyRow(f));
+
+            dom.manage.bulkCoursesList.innerHTML = '';
+            DB.courses.forEach(c => addBulkCourseRow(c));
+        }
+
+        function updateBulkFormDropdowns() {
+            const temp = getTempBulkData();
+
+            const updateSelect = (selectElement, options, selectedValue) => {
+                const currentVal = selectedValue || selectElement.value;
+                selectElement.innerHTML = options.map(opt => `<option value="${opt}" ${opt === currentVal ? 'selected' : ''}>${opt}</option>`).join('');
+                selectElement.value = currentVal;
+            };
+
+            dom.manage.bulkProgramsList.querySelectorAll('.bulk-form-row').forEach(row => {
+                const select = row.querySelector('select');
+                updateSelect(select, temp.departments, select.value);
+            });
+
+            dom.manage.bulkFacultyList.querySelectorAll('.bulk-form-row').forEach(row => {
+                const select = row.querySelector('select');
+                updateSelect(select, temp.departments, select.value);
+            });
+
+            dom.manage.bulkCoursesList.querySelectorAll('.bulk-form-row').forEach(row => {
+                const programSelect = row.querySelectorAll('select')[0];
+                const facultySelect = row.querySelectorAll('select')[1];
+                updateSelect(programSelect, temp.programs, programSelect.value);
+                updateSelect(facultySelect, temp.faculty, facultySelect.value);
+            });
+        }
+
+        function getTempBulkData() {
+            const departments = dom.manage.bulkDepartmentsTextarea.value.split('\n').map(line => line.trim()).filter(Boolean);
+            const programs = Array.from(dom.manage.bulkProgramsList.querySelectorAll('.bulk-form-row')).map(row => row.querySelector('input').value.trim()).filter(Boolean);
+            const faculty = Array.from(dom.manage.bulkFacultyList.querySelectorAll('.bulk-form-row')).map(row => row.querySelector('input').value.trim()).filter(Boolean);
+            return { departments, programs, faculty };
+        }
+
+        function addBulkProgramRow(data = {}) {
+            const { departments } = getTempBulkData();
+            const row = document.createElement('div');
+            row.className = 'bulk-form-row';
+            row.style.gridTemplateColumns = '3fr 3fr 1fr 3fr 1fr';
+            row.innerHTML = `
+                <input type="text" placeholder="Program Name" class="p-2 text-sm" value="${data.programName || ''}">
+                <select class="p-2 text-sm">${departments.map(d => `<option value="${d}" ${d === data.departmentName ? 'selected' : ''}>${d}</option>`).join('')}</select>
+                <input type="number" placeholder="Sems" class="p-2 text-sm" value="${data.semesters || ''}">
+                <input type="text" placeholder="Parent Programs (comma-sep)" class="p-2 text-sm" value="${(data.parentPrograms || []).join(',')}">
+                <button class="px-2 py-1 bg-red-700 text-white rounded-md text-xs">Remove</button>
+            `;
+            row.querySelector('button').addEventListener('click', () => row.remove());
+            dom.manage.bulkProgramsList.appendChild(row);
+        }
+
+        function addBulkFacultyRow(data = {}) {
+            const { departments } = getTempBulkData();
+            const row = document.createElement('div');
+            row.className = 'bulk-form-row';
+            row.style.gridTemplateColumns = '3fr 3fr 2fr 1fr';
+            row.innerHTML = `
+                <input type="text" placeholder="Faculty Name" class="p-2 text-sm" value="${data.facultyName || ''}">
+                <select class="p-2 text-sm">${departments.map(d => `<option value="${d}" ${d === data.departmentName ? 'selected' : ''}>${d}</option>`).join('')}</select>
+                <input type="number" placeholder="Workload Limit" class="p-2 text-sm" value="${data.workloadLimit || ''}">
+                <button class="px-2 py-1 bg-red-700 text-white rounded-md text-xs">Remove</button>
+            `;
+            row.querySelector('button').addEventListener('click', () => row.remove());
+            dom.manage.bulkFacultyList.appendChild(row);
+        }
+
+        function addBulkCourseRow(data = {}) {
+            const { programs, faculty } = getTempBulkData();
+            const row = document.createElement('div');
+            row.className = 'bulk-form-row';
+            row.style.gridTemplateColumns = '2fr 1fr 3fr 1fr 1fr 2fr 1fr';
+            row.innerHTML = `
+                <select class="p-2 text-sm">${programs.map(p => `<option value="${p}" ${p === data.programName ? 'selected' : ''}>${p}</option>`).join('')}</select>
+                <input type="number" placeholder="Sem" class="p-2 text-sm" value="${data.semester || ''}">
+                <input type="text" placeholder="Course Name" class="p-2 text-sm" value="${data.courseName || ''}">
+                <select class="p-2 text-sm">
+                    <option value="Theory" ${data.courseType === 'Theory' ? 'selected' : ''}>Theory</option>
+                    <option value="Applied" ${data.courseType === 'Applied' ? 'selected' : ''}>Applied</option>
+                </select>
+                <input type="number" placeholder="Periods" class="p-2 text-sm" value="${data.periodsPerWeek || ''}">
+                <select class="p-2 text-sm">${faculty.map(f => `<option value="${f}" ${f === data.facultyName ? 'selected' : ''}>${f}</option>`).join('')}</select>
+                <button class="px-2 py-1 bg-red-700 text-white rounded-md text-xs">Remove</button>
+            `;
+            row.querySelector('button').addEventListener('click', () => row.remove());
+            dom.manage.bulkCoursesList.appendChild(row);
+        }
+
+        function handleSaveBulkData() {
+            try {
+                DB.departments = dom.manage.bulkDepartmentsTextarea.value.split('\n')
+                    .map(line => ({ departmentName: line.trim() }))
+                    .filter(d => d.departmentName);
+
+                DB.programs = Array.from(dom.manage.bulkProgramsList.querySelectorAll('.bulk-form-row')).map(row => {
+                    const inputs = row.querySelectorAll('input, select');
+                    return {
+                        programName: inputs[0].value.trim(),
+                        departmentName: inputs[1].value,
+                        semesters: parseInt(inputs[2].value) || 6,
+                        parentPrograms: inputs[3].value.split(',').map(p => p.trim()).filter(p => p)
+                    };
+                }).filter(p => p.programName);
+
+                DB.faculty = Array.from(dom.manage.bulkFacultyList.querySelectorAll('.bulk-form-row')).map(row => {
+                    const inputs = row.querySelectorAll('input, select');
+                    return {
+                        facultyName: inputs[0].value.trim(),
+                        departmentName: inputs[1].value,
+                        workloadLimit: parseInt(inputs[2].value) || DB.workloadLimit
+                    };
+                }).filter(f => f.facultyName);
+                
+                DB.courses = Array.from(dom.manage.bulkCoursesList.querySelectorAll('.bulk-form-row')).map(row => {
+                    const inputs = row.querySelectorAll('input, select');
+                    return {
+                        programName: inputs[0].value,
+                        semester: parseInt(inputs[1].value) || 1,
+                        courseName: inputs[2].value.trim(),
+                        courseType: inputs[3].value,
+                        periodsPerWeek: parseInt(inputs[4].value) || 4,
+                        facultyName: inputs[5].value
+                    };
+                }).filter(c => c.programName && c.courseName);
+
+                DB.schedule = {}; 
+
+                saveState();
+                Swal.fire('Success', 'Bulk data saved. Note: All existing schedules were cleared.', 'success');
+                toggleEditMode('individual');
+
+            } catch (error) {
+                Swal.fire('Error', `Could not save bulk data. Please check the forms. Error: ${error.message}`, 'error');
             }
         }
         
@@ -1198,7 +1456,6 @@
                     const nameToDelete = program.programName;
                     DB.programs.splice(index, 1);
                     
-                    // Delete associated courses and their schedules
                     DB.courses = DB.courses.filter(c => {
                         if (c.programName === nameToDelete) {
                             const courseIdToDelete = getCourseUniqueId(c);
@@ -1209,12 +1466,11 @@
                                     }
                                 });
                             });
-                            return false; // remove course
+                            return false;
                         }
                         return true;
                     });
                     
-                    // Remove from parentProgram arrays
                     DB.programs.forEach(p => {
                         if (p.parentPrograms && p.parentPrograms.includes(nameToDelete)) {
                             p.parentPrograms = p.parentPrograms.filter(parent => parent !== nameToDelete);
@@ -1322,7 +1578,6 @@
                     Object.values(DB.schedule).forEach(progSched => {
                         Object.keys(progSched).forEach(slotKey => {
                             if(progSched[slotKey].facultyName === facultyName) {
-                                // Just unassign, don't delete the slot
                                 progSched[slotKey].facultyName = "Unassigned";
                             }
                         });
@@ -1451,7 +1706,7 @@
             });
         }
         
-        function isSlotClashing(day, period, courseForSlot, tempSchedule = DB.schedule) {
+        function isSlotClashing(day, period, courseForSlot) {
             const programsPotentiallyAffected = [
                 courseForSlot.programName, 
                 ...findAllChildPrograms(courseForSlot.programName)
@@ -1470,7 +1725,7 @@
                 }
             }
 
-            if (checkForFacultyClash(courseForSlot.facultyName, day, period, tempSchedule)) {
+            if (checkForFacultyClash(courseForSlot.facultyName, day, period)) {
                 return true;
             }
             
@@ -1485,27 +1740,23 @@
             return false;
         }
 
-        function scheduleCourseAt(day, period, courseToSchedule) {
+        async function scheduleCourseAt(day, period, courseToSchedule) {
             if (isSlotClashing(day, period, courseToSchedule)) {
                 const facultyClash = checkForFacultyClash(courseToSchedule.facultyName, day, period);
                 if (facultyClash) {
-                     Swal.fire({ icon: 'error', title: 'Faculty Clash!', html: `<b>${facultyClash.facultyName}</b> is already scheduled for <b>${facultyClash.course.courseName}</b> for <b>${facultyClash.programName} (Sem ${facultyClash.semester})</b> at this time.` });
+                    Swal.fire({ icon: 'error', title: 'Faculty Clash!', html: `<b>${facultyClash.facultyName}</b> is already scheduled for <b>${facultyClash.course.courseName}</b> for <b>${facultyClash.programName} (Sem ${facultyClash.semester})</b> at this time.` });
                 } else {
-                     Swal.fire('Slot Taken', `This time slot is already occupied, reserved by a fixed block (like Skill Drill) in a related program, or blocked for another reason.`, 'error');
+                    Swal.fire('Slot Taken', `This time slot is already occupied by another course or a fixed block.`, 'error');
                 }
                 return;
             }
 
-            const courseProgram = courseToSchedule.programName;
-            const courseSemester = courseToSchedule.semester;
-            const facultyName = courseToSchedule.facultyName;
-            const slotKey = `${day}_${period}`;
-            
-            const scheduleKey = `${courseProgram}_${courseSemester}`;
+            const scheduleKey = `${courseToSchedule.programName}_${courseToSchedule.semester}`;
             if (!DB.schedule[scheduleKey]) {
                 DB.schedule[scheduleKey] = {};
             }
-            DB.schedule[scheduleKey][slotKey] = { course: courseToSchedule, facultyName: facultyName };
+            const slotKey = `${day}_${period}`;
+            DB.schedule[scheduleKey][slotKey] = { course: courseToSchedule, facultyName: courseToSchedule.facultyName };
 
             saveState();
             renderAll();
@@ -1567,7 +1818,7 @@
             });
         }
 
-        function checkForFacultyClash(facultyName, day, period, tempSchedule = DB.schedule) {
+        function checkForFacultyClash(facultyName, day, period) {
             if (facultyName === "Unassigned") return null;
             
             const teachesFixedBlockCourse = DB.courses.some(c => 
@@ -1582,10 +1833,10 @@
             }
 
             const slotKey = `${day}_${period}`;
-            for (const progKey in tempSchedule) {
-                if (tempSchedule[progKey]?.[slotKey]?.facultyName === facultyName) {
+            for (const progKey in DB.schedule) {
+                if (DB.schedule[progKey]?.[slotKey]?.facultyName === facultyName) {
                     const [programName, semester] = progKey.split('_');
-                    return { ...tempSchedule[progKey][slotKey], programName, semester };
+                    return { ...DB.schedule[progKey][slotKey], programName, semester };
                 }
             }
             return null;
@@ -1674,14 +1925,12 @@
                         throw new Error("The 'Programs' and 'Courses' sheets are required and cannot be empty.");
                     }
 
-                    // Sanitize faculty data
                     newDB.faculty = facultyData.map(row => ({
                         facultyName: String(row.facultyName || 'Unnamed Faculty').trim(),
                         departmentName: String(row.departmentName || 'No Department').trim(),
                         workloadLimit: parseInt(row.workloadLimit) || oldLimit
                     })).filter(f => f.facultyName && f.facultyName !== 'Unnamed Faculty');
 
-                    // Sanitize program data
                     newDB.programs = programsData.map(row => ({
                         programName: String(row.programName || '').trim(),
                         departmentName: String(row.departmentName || 'No Department').trim(),
@@ -1689,7 +1938,6 @@
                         parentPrograms: row.parentPrograms ? String(row.parentPrograms).split(',').map(p => p.trim()) : []
                     })).filter(p => p.programName);
 
-                    // Sanitize course data
                     newDB.courses = coursesData.map(row => ({
                         programName: String(row.programName || '').trim(),
                         semester: parseInt(row.semester) || 1,
@@ -1717,38 +1965,24 @@
             reader.readAsArrayBuffer(file);
         }
         
-        function downloadTemplate() {
+        function exportCurrentDataAsExcel() {
             const wb = XLSX.utils.book_new();
             
-            const programsData = [
-                { programName: "BCA", departmentName: "School of Computer Science", semesters: 6, parentPrograms: "BCA-BTech-Common, BCA-DCE-Common" },
-                { programName: "BTech CSE", departmentName: "School of Engineering", semesters: 8, parentPrograms: "BCA-BTech-Common" },
-                { programName: "BCA-DCE", departmentName: "School of Computer Science", semesters: 6, parentPrograms: "BCA-DCE-Common" },
-                { programName: "BCA-BTech-Common", departmentName: "School of Computer Science", semesters: 6, parentPrograms: "" },
-                { programName: "BCA-DCE-Common", departmentName: "School of Computer Science", semesters: 6, parentPrograms: "" }
-            ];
-            const wsPrograms = XLSX.utils.json_to_sheet(programsData);
-            XLSX.utils.book_append_sheet(wb, wsPrograms, "Programs");
+            const programsSheet = XLSX.utils.json_to_sheet(DB.programs.map(p => ({
+                programName: p.programName,
+                departmentName: p.departmentName,
+                semesters: p.semesters,
+                parentPrograms: (p.parentPrograms || []).join(',')
+            })));
+            XLSX.utils.book_append_sheet(wb, programsSheet, "Programs");
 
-            const coursesData = [
-                { programName: "BCA", semester: 3, courseName: "Data Structures", courseType: "Theory", periodsPerWeek: 4, facultyName: "Dr. Ada Lovelace" },
-                { programName: "BCA", semester: 3, courseName: "Web Development", courseType: "Applied", periodsPerWeek: 4, facultyName: "Dr. Grace Hopper" },
-                { programName: "BTech CSE", semester: 5, courseName: "Advanced Algorithms", courseType: "Theory", periodsPerWeek: 4, facultyName: "Dr. Charles Babbage" },
-                { programName: "BCA-BTech-Common", semester: 1, courseName: "Intro to Programming", courseType: "Theory", periodsPerWeek: 4, facultyName: "Prof. John Doe" }
-            ];
-            const wsCourses = XLSX.utils.json_to_sheet(coursesData);
-            XLSX.utils.book_append_sheet(wb, wsCourses, "Courses");
+            const coursesSheet = XLSX.utils.json_to_sheet(DB.courses);
+            XLSX.utils.book_append_sheet(wb, coursesSheet, "Courses");
 
-            const facultyData = [
-                { facultyName: "Dr. Ada Lovelace", departmentName: "School of Computer Science", workloadLimit: 18 },
-                { facultyName: "Dr. Grace Hopper", departmentName: "School of Computer Science", workloadLimit: 20 },
-                { facultyName: "Dr. Charles Babbage", departmentName: "School of Engineering", workloadLimit: 20 },
-                { facultyName: "Prof. John Doe", departmentName: "School of Computer Science", workloadLimit: 20 }
-            ];
-            const wsFaculty = XLSX.utils.json_to_sheet(facultyData);
-            XLSX.utils.book_append_sheet(wb, wsFaculty, "Faculty");
+            const facultySheet = XLSX.utils.json_to_sheet(DB.faculty);
+            XLSX.utils.book_append_sheet(wb, facultySheet, "Faculty");
 
-            XLSX.writeFile(wb, "Timetable_Template_MultiSheet.xlsx");
+            XLSX.writeFile(wb, "Timetable_Current_Data.xlsx");
         }
 
         function populateSelect(selectElement, options, isObject = false) {
@@ -1791,7 +2025,7 @@
                 if (!selectedGroup.program || !selectedGroup.semester) { Swal.fire('Cannot Print', 'Please select a program and semester first.', 'info'); return; }
                 gridToPrint = dom.timetableGrid.cloneNode(true);
                 title = `Timetable for ${selectedGroup.program} - Semester ${selectedGroup.semester}`;
-            } else {
+            } else if (view === 'faculty') {
                  if (!selectedFaculty.name) { Swal.fire('Cannot Print', 'Please select a faculty member first.', 'info'); return; }
                 gridToPrint = dom.facultyTimetableGrid.cloneNode(true);
                 title = `Schedule for ${selectedFaculty.name}`;
@@ -1818,9 +2052,9 @@
                 semester = selectedGroup.semester;
                 filename = `Timetable_${programName}_Sem_${semester}.xlsx`;
                 data = getEffectiveScheduleForGroup(programName, semester);
-            } else { 
+            } else if (view === 'faculty') { 
                 if (!selectedFaculty.name) { Swal.fire('Cannot Export', 'Please select a faculty member first.', 'info'); return; }
-                programName = null; // Not applicable for faculty view
+                programName = null;
                 semester = null; 
                 const facultyName = selectedFaculty.name;
                 filename = `Schedule_${facultyName.replace(/\s/g, '_')}.xlsx`;
@@ -1845,7 +2079,6 @@
             const boldStyle = { font: { bold: true }, alignment: { horizontal: "center", vertical: "center" } };
             const centerStyle = { alignment: { horizontal: "center", vertical: "center", wrapText: true } };
 
-            // Set Headers
             ws[XLSX.utils.encode_cell({c:0, r:0})] = { v: 'Day/Time', s: boldStyle };
             periods.forEach((period, i) => {
                 ws[XLSX.utils.encode_cell({c:i+1, r:0})] = { v: `${period.time}\n(Period ${period.number})`, s: boldStyle };
@@ -1896,7 +2129,7 @@
                     if (scheduledItem) {
                         if (view === 'group') {
                             cell.v = `${scheduledItem.course.courseName}\n(${scheduledItem.facultyName})`;
-                        } else {
+                        } else if (view === 'faculty') {
                             cell.v = `${scheduledItem.course.courseName}\n(${scheduledItem.programName} - Sem ${scheduledItem.semester})`;
                         }
                         
@@ -1912,7 +2145,7 @@
             const range = { s: { c: 0, r: 0 }, e: { c: periods.length, r: days.length } };
             ws['!ref'] = XLSX.utils.encode_range(range);
             ws['!cols'] = [{ wch: 15 }, ...periods.map(() => ({ wch: 25 }))];
-            ws['!rows'] = [{ hpx: 30 }, ...days.map(() => ({ hpx: 40 }))];
+            ws['!rows'] = [{ hpx: 40 }, ...days.map(() => ({ hpx: 50 }))];
             
             return ws;
         }

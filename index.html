@@ -230,6 +230,7 @@
                 <button data-view="group" class="tab-button active" title="View and edit timetables by student program and semester">Student Group Schedule</button>
                 <button data-view="faculty" class="tab-button" title="View schedules for individual faculty members">Faculty Schedule</button>
                 <button data-view="manage" class="tab-button" title="Manage all underlying data like programs, courses, and faculty">Data & Settings</button>
+                <button data-view="about" class="tab-button" title="About the tool and user guide">About</button>
             </nav>
         </div>
 
@@ -427,6 +428,72 @@
                             </div>
                         </div>
                         <div id="faculty-timetable-grid" class="timetable-grid"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="about-view" class="hidden panel p-6 text-gray-300">
+                <div class="flex flex-col md:flex-row gap-8 items-center">
+                    <div class="flex-shrink-0">
+                        <img src="unnamed.jpg" alt="Developer: Sandhya Sharma"
+     class="w-24 h-24 sm:w-32 sm:h-32 md:w-[170px] md:h-[170px] object-cover rounded-full border-4 border-[--main-color] shadow-md">
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white mb-2">A Note from the Developer</h2>
+                        <p class="mb-4">
+                            Hello! I'm Sandhya Sharma, and I'm thrilled you're using this University Timetable Planning Tool. I developed this application to simplify the complex and often stressful process of academic scheduling. My goal was to create an intuitive, collaborative, and powerful tool that helps administrators and planners avoid clashes and manage resources efficiently. I hope it saves you time and makes your work easier.
+                        </p>
+                        <p>Thank you for your support!</p>
+                    </div>
+                </div>
+
+                <hr class="my-8 border-white/10">
+
+                <div>
+                    <h3 class="text-xl font-semibold text-white mb-4">Key Features</h3>
+                    <ul class="list-disc list-inside space-y-2">
+                        <li><strong>Real-time Collaboration:</strong> Share your workspace URL with colleagues to plan timetables together, live.</li>
+                        <li><strong>Drag & Drop Scheduling:</strong> Easily drag courses from the list and drop them into available time slots.</li>
+                        <li><strong>Automatic Clash Detection:</strong> The tool instantly highlights clashes for faculty, ensuring no double-bookings.</li>
+                        <li><strong>Flexible Data Management:</strong> Import data from Excel, or use the built-in forms (Individual or Bulk Edit) to manage departments, programs, faculty, and courses.</li>
+                        <li><strong>Multiple Views:</strong> View schedules by student group or by individual faculty members to get the full picture.</li>
+                        <li><strong>Comprehensive Export Options:</strong> Export individual timetables or entire workbooks for all programs and faculty to Excel for offline use and record-keeping.</li>
+                    </ul>
+                </div>
+
+                <hr class="my-8 border-white/10">
+
+                <div>
+                    <h3 class="text-xl font-semibold text-white mb-4">User Manual</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="font-semibold text-white">1. Getting Started</h4>
+                            <p>When you first open the tool, a unique workspace is created for you. The ID is in the URL (e.g., `?appId=...`). To collaborate, simply share this full URL with others.</p>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-white">2. Managing Your Data</h4>
+                            <p>Go to the <strong>Data & Settings</strong> tab. You have two main options:</p>
+                            <ul class="list-disc list-inside ml-4 mt-2 space-y-1 text-sm">
+                                <li><strong>Import Data:</strong> The fastest way to start. Download the template, fill it with your university's data (Programs, Faculty, Courses), and upload it using the "Import Data" button.</li>
+                                <li><strong>Manual Entry:</strong> Use the "Bulk Edit" mode for a structured way to enter all your data at once, or "Individual" mode to add or edit items one by one.</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-white">3. Scheduling Classes</h4>
+                            <p>In the <strong>Student Group Schedule</strong> tab, select a Department, Program, and Semester. A list of courses for that group will appear on the left. Simply drag a course from the list and drop it onto an available slot in the timetable grid on the right.</p>
+                        </div>
+                         <div>
+                            <h4 class="font-semibold text-white">4. Viewing Schedules</h4>
+                            <p>Use the top navigation tabs to switch between different views:</p>
+                             <ul class="list-disc list-inside ml-4 mt-2 space-y-1 text-sm">
+                                <li><strong>Student Group Schedule:</strong> The main view for planning and editing timetables for specific student groups.</li>
+                                <li><strong>Faculty Schedule:</strong> Select a faculty member from the dropdown to see their complete weekly schedule and workload.</li>
+                            </ul>
+                        </div>
+                         <div>
+                            <h4 class="font-semibold text-white">5. Exporting</h4>
+                            <p>Use the export buttons at the top of the page or within each view to download your timetables as formatted Excel files. You can also download all your raw data from the "Data & Settings" tab.</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2045,6 +2112,7 @@
         }
         
         function exportToExcel(view) {
+            assignAllCourseColors();
             let data, filename, semester, programName;
             if (view === 'group') {
                 if (!selectedGroup.program || !selectedGroup.semester) { Swal.fire('Cannot Export', 'Please select a program and semester first.', 'info'); return; }
@@ -2075,6 +2143,9 @@
         }
 
         function createTimetableSheet(view, data, programName, semester) {
+            // NOTE: The community version of the xlsx.js library does not support cell styling (e.g., colors).
+            // The 's' (style) property is included here for compatibility with the Pro version of the library.
+            // In the free version, these styles will be ignored, and the cells will not be colored.
             const ws = {};
             const boldCentered = { font: { bold: true }, alignment: { horizontal: "center", vertical: "center", wrapText: true } };
             const centered = { alignment: { horizontal: "center", vertical: "center", wrapText: true } };
@@ -2167,8 +2238,18 @@
             return ws;
         }
 
+        function assignAllCourseColors() {
+            DB.courses.forEach(course => {
+                const courseId = getCourseUniqueId(course);
+                if (!courseColors[courseId]) {
+                    courseColors[courseId] = colorPalette[Object.keys(courseColors).length % colorPalette.length];
+                }
+            });
+        }
+
         function exportTimetableWorkbook() {
             dom.loader.classList.remove('hidden');
+            assignAllCourseColors();
             Swal.fire({
                 title: 'Generating Timetable Workbook...',
                 text: 'This may take a moment for large datasets.',
@@ -2178,17 +2259,7 @@
 
             setTimeout(() => {
                 const wb = XLSX.utils.book_new();
-                Object.values(DB.schedule).forEach(progSched => {
-                    Object.values(progSched).forEach(slot => {
-                        if (slot.course) {
-                            const courseId = getCourseUniqueId(slot.course);
-                            if (!courseColors[courseId]) {
-                                courseColors[courseId] = colorPalette[Object.keys(courseColors).length % colorPalette.length];
-                            }
-                        }
-                    });
-                });
-
+                
                 const scheduledKeys = Object.keys(DB.schedule).sort();
                 scheduledKeys.forEach(progSemKey => {
                     if (!DB.schedule[progSemKey] || Object.keys(DB.schedule[progSemKey]).length === 0) return;
@@ -2216,6 +2287,7 @@
 
         function exportFacultyWorkbook() {
             dom.loader.classList.remove('hidden');
+            assignAllCourseColors();
             Swal.fire({
                 title: 'Generating Faculty Workbook...',
                 text: 'This may take a moment for large datasets.',
@@ -2225,16 +2297,6 @@
 
             setTimeout(() => {
                 const wb = XLSX.utils.book_new();
-                Object.values(DB.schedule).forEach(progSched => {
-                    Object.values(progSched).forEach(slot => {
-                        if (slot.course) {
-                            const courseId = getCourseUniqueId(slot.course);
-                            if (!courseColors[courseId]) {
-                                courseColors[courseId] = colorPalette[Object.keys(courseColors).length % colorPalette.length];
-                            }
-                        }
-                    });
-                });
 
                 DB.faculty.forEach(faculty => {
                     const facultyName = faculty.facultyName;
@@ -2297,6 +2359,7 @@
             }
             document.querySelector('.course-card.dragging')?.classList.remove('dragging');
         }
+
     </script>
 </body>
 </html>

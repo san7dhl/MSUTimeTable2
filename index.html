@@ -2076,77 +2076,94 @@
 
         function createTimetableSheet(view, data, programName, semester) {
             const ws = {};
-            const boldStyle = { font: { bold: true }, alignment: { horizontal: "center", vertical: "center" } };
-            const centerStyle = { alignment: { horizontal: "center", vertical: "center", wrapText: true } };
-
-            ws[XLSX.utils.encode_cell({c:0, r:0})] = { v: 'Day/Time', s: boldStyle };
-            periods.forEach((period, i) => {
-                ws[XLSX.utils.encode_cell({c:i+1, r:0})] = { v: `${period.time}\n(Period ${period.number})`, s: boldStyle };
+            const boldCentered = { font: { bold: true }, alignment: { horizontal: "center", vertical: "center", wrapText: true } };
+            const centered = { alignment: { horizontal: "center", vertical: "center", wrapText: true } };
+            
+            // Set Timetable Headers
+            ws[XLSX.utils.encode_cell({c:0, r:0})] = { v: 'Day/Time', s: boldCentered };
+            periods.forEach((p, i) => {
+                ws[XLSX.utils.encode_cell({c:i+1, r:0})] = { v: `${p.time}\n(Period ${p.number})`, s: boldCentered };
             });
 
             const lunchPeriod = LUNCH_PERIODS[semester] || LUNCH_PERIODS.default;
             const accentColor = ACCENT_COLOR_HEX;
 
-            days.forEach((day, r) => {
-                ws[XLSX.utils.encode_cell({c:0, r:r+1})] = { v: day, s: boldStyle };
+            days.forEach((day, r_offset) => {
+                const r = r_offset + 1;
+                ws[XLSX.utils.encode_cell({c:0, r:r})] = { v: day, s: boldCentered };
 
-                periods.forEach((period, c) => {
-                    const cellRef = XLSX.utils.encode_cell({c:c+1, r:r+1});
-                    let cell = { v: '', s: centerStyle };
-
-                    if (view === 'group' && semester) {
-                        const currentProgram = DB.programs.find(p => p.programName === programName);
-                        const programsInHierarchy = currentProgram ? [currentProgram.programName, ...(currentProgram.parentPrograms || [])] : [];
-                        const uniqueHierarchy = [...new Set(programsInHierarchy)];
-                        let fixedBlock = null;
-                        for (const progName of uniqueHierarchy) {
-                            const isExcluded = progName.toLowerCase().includes('dce') || progName.toLowerCase().includes('btech');
-                            if (!isExcluded) {
-                                const block = FIXED_BLOCKS.find(b => b.semester == semester && b.day === day && b.periods.includes(period.number));
-                                if (block) {
-                                    fixedBlock = block;
-                                    break;
-                                }
-                            }
-                        }
-                        if (fixedBlock) {
-                            cell.v = fixedBlock.label;
-                            cell.s = { ...centerStyle, fill: { fgColor: { rgb: accentColor } }, font: { color: { rgb: "FFFFFF" }, bold: true } };
-                            ws[cellRef] = cell;
-                            return;
-                        }
-                    }
+                periods.forEach((period, c_offset) => {
+                    const c = c_offset + 1;
+                    const cellRef = XLSX.utils.encode_cell({c, r});
+                    let cell = { v: '', s: centered };
 
                     if (semester && period.number === lunchPeriod) {
                         cell.v = 'LUNCH';
-                        cell.s = { ...centerStyle, fill: { fgColor: { rgb: accentColor } }, font: { color: { rgb: "FFFFFF" }, bold: true } };
-                        ws[cellRef] = cell;
-                        return;
-                    }
-
-                    const slotKey = `${day}_${period.number}`;
-                    const scheduledItem = data[slotKey];
-                    if (scheduledItem) {
-                        if (view === 'group') {
-                            cell.v = `${scheduledItem.course.courseName}\n(${scheduledItem.facultyName})`;
-                        } else if (view === 'faculty') {
-                            cell.v = `${scheduledItem.course.courseName}\n(${scheduledItem.programName} - Sem ${scheduledItem.semester})`;
+                        cell.s = { ...centered, fill: { fgColor: { rgb: accentColor } }, font: { color: { rgb: "FFFFFF" }, bold: true } };
+                    } else {
+                        const slotKey = `${day}_${period.number}`;
+                        const scheduledItem = data[slotKey];
+                        if (scheduledItem) {
+                             if (view === 'group') {
+                                cell.v = `${scheduledItem.course.courseName}\n(${scheduledItem.facultyName})`;
+                            } else if (view === 'faculty') {
+                                cell.v = `${scheduledItem.course.courseName}\n(${scheduledItem.programName} - Sem ${scheduledItem.semester})`;
+                            }
+                            const courseId = getCourseUniqueId(scheduledItem.course);
+                            const color = (courseColors[courseId] || '#334155').substring(1);
+                            cell.s = { ...centered, fill: { fgColor: { rgb: color } }, font: { color: { rgb: "FFFFFF" } } };
                         }
-                        
-                        const courseId = getCourseUniqueId(scheduledItem.course);
-                        const color = (courseColors[courseId] || '#334155').substring(1);
-                        cell.s = { ...centerStyle, fill: { fgColor: { rgb: color } }, font: { color: { rgb: "FFFFFF" } } };
                     }
-                    
                     ws[cellRef] = cell;
                 });
             });
 
-            const range = { s: { c: 0, r: 0 }, e: { c: periods.length, r: days.length } };
-            ws['!ref'] = XLSX.utils.encode_range(range);
-            ws['!cols'] = [{ wch: 15 }, ...periods.map(() => ({ wch: 25 }))];
-            ws['!rows'] = [{ hpx: 40 }, ...days.map(() => ({ hpx: 50 }))];
+            let currentRow = days.length + 3; // Start summary table after a couple of blank rows
+
+            if (view === 'group') {
+                const summaryHeader = ['COURSE NAME', 'COURSE CODE', 'TEACHING FACULTY', 'DESIGNATION', 'CREDITS', 'SESSIONS'];
+                summaryHeader.forEach((h, i) => {
+                    ws[XLSX.utils.encode_cell({c:i, r:currentRow})] = { v: h, s: boldCentered };
+                });
+                currentRow++;
+
+                const courseSessionCount = {};
+                const scheduledCourses = {};
+                Object.values(data).forEach(slot => {
+                    if (slot.course) {
+                        const courseId = getCourseUniqueId(slot.course);
+                        courseSessionCount[courseId] = (courseSessionCount[courseId] || 0) + 1;
+                        if (!scheduledCourses[courseId]) {
+                            scheduledCourses[courseId] = slot.course;
+                        }
+                    }
+                });
+
+                Object.values(scheduledCourses).sort((a,b) => a.courseName.localeCompare(b.courseName)).forEach(course => {
+                    const courseId = getCourseUniqueId(course);
+                    const color = (courseColors[courseId] || '#334155').substring(1);
+                    const courseNameCell = { v: course.courseName, s: { ...centered, fill: { fgColor: { rgb: color } }, font: { color: { rgb: "FFFFFF" } } } };
+                    const courseCodeCell = { v: '', s: centered };
+                    const facultyNameCell = { v: course.facultyName, s: centered };
+                    const designationCell = { v: 'N/A', s: centered };
+                    const creditsCell = { v: 'N/A', s: centered };
+                    const sessionsCell = { v: courseSessionCount[courseId] || 0, s: centered };
+                    
+                    ws[XLSX.utils.encode_cell({c:0, r:currentRow})] = courseNameCell;
+                    ws[XLSX.utils.encode_cell({c:1, r:currentRow})] = courseCodeCell;
+                    ws[XLSX.utils.encode_cell({c:2, r:currentRow})] = facultyNameCell;
+                    ws[XLSX.utils.encode_cell({c:3, r:currentRow})] = designationCell;
+                    ws[XLSX.utils.encode_cell({c:4, r:currentRow})] = creditsCell;
+                    ws[XLSX.utils.encode_cell({c:5, r:currentRow})] = sessionsCell;
+                    currentRow++;
+                });
+            }
             
+            const range = { s: { c: 0, r: 0 }, e: { c: periods.length, r: currentRow } };
+            ws['!ref'] = XLSX.utils.encode_range(range);
+            ws['!cols'] = [{ wch: 25 }, { wch: 15 }, { wch: 25 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, ...periods.map(() => ({ wch: 25 }))];
+            ws['!rows'] = [{ hpx: 40 }, ...days.map(() => ({ hpx: 50 }))];
+
             return ws;
         }
 
@@ -2280,7 +2297,6 @@
             }
             document.querySelector('.course-card.dragging')?.classList.remove('dragging');
         }
-
     </script>
 </body>
 </html>

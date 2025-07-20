@@ -233,12 +233,22 @@
         </header>
 
         <div class="mb-8">
-            <nav class="flex space-x-2" id="view-tabs">
-                <button data-view="group" class="tab-button active" title="View and edit timetables by student program and semester">Student Group Schedule</button>
-                <button data-view="faculty" class="tab-button" title="View schedules for individual faculty members">Faculty Schedule</button>
-                <button data-view="manage" class="tab-button" title="Manage all underlying data like programs, courses, and faculty">Data & Settings</button>
-                <button data-view="about" class="tab-button" title="About the tool">About</button>
-                <button data-view="manual" class="tab-button" title="View the user manual">User Manual</button>
+            <nav class="flex items-center space-x-2" id="view-tabs-container">
+                <div id="view-tabs" class="flex space-x-2">
+                    <button data-view="group" class="tab-button active" title="View and edit timetables by student program and semester">Student Group Schedule</button>
+                    <button data-view="faculty" class="tab-button" title="View schedules for individual faculty members">Faculty Schedule</button>
+                    <button data-view="manage" class="tab-button" title="Manage all underlying data like programs, courses, and faculty">Data & Settings</button>
+                </div>
+                <div class="flex-grow"></div>
+                <div class="relative" id="help-menu-container">
+                    <button id="help-menu-button" class="px-4 py-2 text-sm bg-slate-800 rounded-lg hover:bg-slate-700 transition-colors" title="Help">
+                        Help
+                    </button>
+                    <div id="help-menu-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-slate-800 rounded-lg shadow-lg py-1 z-20 border border-slate-700">
+                        <a href="#" data-view="about" class="block px-4 py-2 text-sm text-gray-300 hover:bg-slate-700 help-menu-item">About this Tool</a>
+                        <a href="#" data-view="manual" class="block px-4 py-2 text-sm text-gray-300 hover:bg-slate-700 help-menu-item">User Manual</a>
+                    </div>
+                </div>
             </nav>
         </div>
 
@@ -770,7 +780,8 @@
 
         function initEventListeners() {
             document.getElementById('view-tabs').addEventListener('click', (e) => {
-                if (e.target.tagName === 'BUTTON') showView(e.target.dataset.view);
+                const button = e.target.closest('.tab-button');
+                if (button) showView(button.dataset.view);
             });
             document.getElementById('import-button').addEventListener('click', handleImport);
             document.getElementById('download-template-btn').addEventListener('click', downloadSmartTemplate);
@@ -843,6 +854,29 @@
             dom.manage.bulkAddProgramBtn.addEventListener('click', () => addBulkProgramRow());
             dom.manage.bulkAddFacultyBtn.addEventListener('click', () => addBulkFacultyRow());
             dom.manage.bulkAddCourseBtn.addEventListener('click', () => addBulkCourseRow());
+
+            // Help Menu Listener
+            const helpMenuButton = document.getElementById('help-menu-button');
+            const helpMenuDropdown = document.getElementById('help-menu-dropdown');
+            helpMenuButton.addEventListener('click', () => {
+                helpMenuDropdown.classList.toggle('hidden');
+            });
+
+            helpMenuDropdown.addEventListener('click', (e) => {
+                const item = e.target.closest('.help-menu-item');
+                if (item) {
+                    e.preventDefault();
+                    showView(item.dataset.view);
+                    helpMenuDropdown.classList.add('hidden');
+                }
+            });
+            
+            // Close dropdown if clicked outside
+            document.addEventListener('click', (e) => {
+                if (!helpMenuButton.contains(e.target) && !helpMenuDropdown.contains(e.target)) {
+                    helpMenuDropdown.classList.add('hidden');
+                }
+            });
         }
 
         async function saveState() { 
@@ -876,7 +910,12 @@
         function showView(viewName) {
             document.querySelectorAll('#main-content > div').forEach(v => v.classList.add('hidden'));
             document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
-            document.querySelector(`[data-view="${viewName}"]`).classList.add('active');
+            
+            const mainViewButton = document.querySelector(`#view-tabs .tab-button[data-view="${viewName}"]`);
+            if (mainViewButton) {
+                mainViewButton.classList.add('active');
+            }
+
             document.getElementById(`${viewName}-view`).classList.remove('hidden');
             
             if (viewName === 'group') {

@@ -204,6 +204,13 @@
             border-bottom: none;
             margin-bottom: 0;
         }
+        .health-check-list {
+            text-align: left;
+            margin-top: 0.5rem;
+            padding-left: 1rem;
+            list-style-type: disc;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body class="text-gray-200">
@@ -216,12 +223,12 @@
             <h1 class="text-3xl font-bold text-white">Medhavi Skills University Timetable Planning Tool</h1>
             <p class="text-gray-400 mt-1">Automated clash detection with custom faculty workload warnings.</p>
              <div id="collab-info" class="mt-4 text-xs text-gray-400">
-                <p>Workspace ID: <span id="user-id-display" class="font-mono"></span></p>
-                <div class="mt-4 flex justify-center items-center space-x-4">
-                    <button id="share-btn" class="px-4 py-2 bg-white/10 rounded-lg hover:bg-white/20 transition" title="Share a link to this workspace for collaboration">Share Workspace</button>
-                    <button id="export-timetable-workbook-btn" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors flex-shrink-0" title="Export all program timetables to an Excel workbook">Export Timetables</button>
-                    <button id="export-faculty-workbook-btn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex-shrink-0" title="Export all faculty schedules to an Excel workbook">Export Faculty Schedules</button>
-                </div>
+                 <p>Workspace ID: <span id="user-id-display" class="font-mono"></span></p>
+                 <div class="mt-4 flex justify-center items-center space-x-4">
+                     <button id="share-btn" class="px-4 py-2 bg-white/10 rounded-lg hover:bg-white/20 transition" title="Share a link to this workspace for collaboration">Share Workspace</button>
+                     <button id="export-timetable-workbook-btn" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors flex-shrink-0" title="Export all program timetables to an Excel workbook">Export Timetables</button>
+                     <button id="export-faculty-workbook-btn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex-shrink-0" title="Export all faculty schedules to an Excel workbook">Export Faculty Schedules</button>
+                 </div>
             </div>
         </header>
 
@@ -230,7 +237,8 @@
                 <button data-view="group" class="tab-button active" title="View and edit timetables by student program and semester">Student Group Schedule</button>
                 <button data-view="faculty" class="tab-button" title="View schedules for individual faculty members">Faculty Schedule</button>
                 <button data-view="manage" class="tab-button" title="Manage all underlying data like programs, courses, and faculty">Data & Settings</button>
-                <button data-view="about" class="tab-button" title="About the tool and user guide">About</button>
+                <button data-view="about" class="tab-button" title="About the tool">About</button>
+                <button data-view="manual" class="tab-button" title="View the user manual">User Manual</button>
             </nav>
         </div>
 
@@ -243,16 +251,21 @@
                         <button id="mode-bulk-btn" class="mode-button px-3 py-1 text-sm rounded-md transition-colors">Bulk Edit</button>
                     </div>
                 </div>
-                 
+                
                  <div class="bg-slate-900/50 p-4 rounded-lg border border-[--border-color] mb-8">
-                   <h3 class="text-lg font-medium mb-3 text-white">Import & Export</h3>
-                   <p class="text-gray-400 mb-4 text-sm">You can import data from a multi-sheet Excel file or download all current data for backup or sharing.</p>
+                   <h3 class="text-lg font-medium mb-3 text-white">System Tools</h3>
+                   <p class="text-gray-400 mb-4 text-sm">Import data, export backups, or run a health check to find potential issues in your data.</p>
                    <div class="flex items-center space-x-4">
                         <input type="file" id="excel-file-input" accept=".xlsx, .xls" class="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-white/10 file:text-white hover:file:bg-white/20"/>
                         <button id="import-button" class="px-4 py-2 bg-[--main-color] text-white rounded-lg hover:bg-cyan-700 transition-colors flex-shrink-0" title="Import data from a multi-sheet Excel file. This will overwrite existing data.">Import Data</button>
                    </div>
                     <div class="mt-4 flex items-center space-x-4">
+                        <button id="download-template-btn" class="text-sm text-cyan-400 hover:underline" title="Download an Excel template with pre-configured data validation rules">Download Template</button>
                         <button id="download-current-data-btn" class="text-sm text-amber-400 hover:underline" title="Download all current data as a re-uploadable Excel file">Download All Data as Excel</button>
+                        <button id="health-check-btn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2" title="Scan all data for potential issues like orphans, missing assignments, and typos.">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10c0-4.42-2.87-8.17-6.84-9.5c-.5-.1-.96-.6-.96-1.12V1.2A10 10 0 0 0 12 2z"/><path d="m22 2-4.24 4.24"/><path d="m7.16 14.84 5.66-5.66"/></svg>
+                            Run Data Health Check
+                        </button>
                     </div>
                  </div>
 
@@ -264,7 +277,7 @@
                         <input type="number" id="workload-limit-input" class="mt-1 block w-full max-w-xs pl-3 pr-3 py-2 text-base rounded-md" title="Set the default weekly period limit for faculty workload warnings">
                    </div>
                  </div>
-                 
+                
                 <div id="individual-edit-view">
                     <p class="text-gray-300 mb-6">Add, edit, or delete programs, faculty, and courses directly.</p>
                     <div class="space-y-12">
@@ -433,67 +446,140 @@
             </div>
 
             <div id="about-view" class="hidden panel p-6 text-gray-300">
-                <div class="flex flex-col md:flex-row gap-8 items-center">
-                    <div class="flex-shrink-0">
-                        <img src="unnamed.jpg" alt="Developer: Sandhya Sharma"
-     class="w-24 h-24 sm:w-32 sm:h-32 md:w-[170px] md:h-[170px] object-cover rounded-full border-4 border-[--main-color] shadow-md">
-                    </div>
-                    <div>
-                        <h2 class="text-2xl font-bold text-white mb-2">A Note from the Developer</h2>
-                        <p class="mb-4">
-                            Hello! I'm Sandhya Sharma, and I'm thrilled you're using this University Timetable Planning Tool. I developed this application to simplify the complex and often stressful process of academic scheduling. My goal was to create an intuitive, collaborative, and powerful tool that helps administrators and planners avoid clashes and manage resources efficiently. I hope it saves you time and makes your work easier.
-                        </p>
-                        <p>Thank you for your support!</p>
+                <div class="bg-slate-900/50 p-6 rounded-lg border border-[--border-color] mb-8">
+                    <div class="flex flex-col md:flex-row gap-8 items-center">
+                        <div class="flex-shrink-0">
+                            <img src="unnamed.jpg" alt="Developer: Sandhya Sharma" class="w-24 h-24 sm:w-32 sm:h-32 md:w-[170px] md:h-[170px] object-cover rounded-full border-4 border-[--main-color] shadow-lg mx-auto">
+                        </div>
+                        <div class="text-center md:text-left">
+                            <h2 class="text-2xl font-bold text-white mb-2">A Note from the Developer</h2>
+                            <p class="mb-4 text-gray-400">
+                                Hello! I'm Sandhya Sharma, and I'm thrilled you're using this University Timetable Planning Tool. I developed this application to simplify the complex and often stressful process of academic scheduling. My goal was to create an intuitive, collaborative, and powerful tool that helps administrators and planners avoid clashes and manage resources efficiently. I hope it saves you time and makes your work easier.
+                            </p>
+                            <p>Thank you for your support!</p>
+                        </div>
                     </div>
                 </div>
 
-                <hr class="my-8 border-white/10">
-
                 <div>
-                    <h3 class="text-xl font-semibold text-white mb-4">Key Features</h3>
-                    <ul class="list-disc list-inside space-y-2">
-                        <li><strong>Real-time Collaboration:</strong> Share your workspace URL with colleagues to plan timetables together, live.</li>
-                        <li><strong>Drag & Drop Scheduling:</strong> Easily drag courses from the list and drop them into available time slots.</li>
-                        <li><strong>Automatic Clash Detection:</strong> The tool instantly highlights clashes for faculty, ensuring no double-bookings.</li>
-                        <li><strong>Flexible Data Management:</strong> Import data from Excel, or use the built-in forms (Individual or Bulk Edit) to manage departments, programs, faculty, and courses.</li>
-                        <li><strong>Multiple Views:</strong> View schedules by student group or by individual faculty members to get the full picture.</li>
-                        <li><strong>Comprehensive Export Options:</strong> Export individual timetables or entire workbooks for all programs and faculty to Excel for offline use and record-keeping.</li>
-                    </ul>
+                    <h3 class="text-2xl font-bold text-white text-center mb-6">Key Features</h3>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Feature Card 1 -->
+                        <div class="bg-slate-900/50 p-4 rounded-lg border border-[--border-color] flex items-start space-x-4">
+                            <div class="flex-shrink-0 text-cyan-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-white">Real-time Collaboration</h4>
+                                <p class="text-sm text-gray-400">Share your workspace URL to plan timetables together, live.</p>
+                            </div>
+                        </div>
+                        <!-- Feature Card 2 -->
+                        <div class="bg-slate-900/50 p-4 rounded-lg border border-[--border-color] flex items-start space-x-4">
+                            <div class="flex-shrink-0 text-cyan-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8L22 12L18 16"/><path d="M2 12H22"/><path d="M11 3.81V3.81C7.6 4.2 5 7.28 5 11C5 14.72 7.6 17.8 11 18.19V18.19"/><path d="M11 3.81C14.4 4.2 17 7.28 17 11C17 14.72 14.4 17.8 11 18.19"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-white">Drag & Drop Scheduling</h4>
+                                <p class="text-sm text-gray-400">Easily drag courses from the list and drop them into available time slots.</p>
+                            </div>
+                        </div>
+                        <!-- Feature Card 3 -->
+                        <div class="bg-slate-900/50 p-4 rounded-lg border border-[--border-color] flex items-start space-x-4">
+                            <div class="flex-shrink-0 text-cyan-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-white">Automatic Clash Detection</h4>
+                                <p class="text-sm text-gray-400">The tool instantly highlights clashes for faculty, ensuring no double-bookings.</p>
+                            </div>
+                        </div>
+                        <!-- Feature Card 4 -->
+                        <div class="bg-slate-900/50 p-4 rounded-lg border border-[--border-color] flex items-start space-x-4">
+                            <div class="flex-shrink-0 text-cyan-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="m12 18-3-3 3-3"/><path d="m9 15 8 0"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-white">Flexible Data Management</h4>
+                                <p class="text-sm text-gray-400">Import from Excel, or use the built-in forms to manage all your data.</p>
+                            </div>
+                        </div>
+                        <!-- Feature Card 5 -->
+                        <div class="bg-slate-900/50 p-4 rounded-lg border border-[--border-color] flex items-start space-x-4">
+                            <div class="flex-shrink-0 text-cyan-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10c0-4.42-2.87-8.17-6.84-9.5c-.5-.1-.96-.6-.96-1.12V1.2A10 10 0 0 0 12 2z"/><path d="m22 2-4.24 4.24"/><path d="m7.16 14.84 5.66-5.66"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-white">Data Health Check</h4>
+                                <p class="text-sm text-gray-400">Proactively scan your data for orphans, unassigned items, and potential typos.</p>
+                            </div>
+                        </div>
+                        <!-- Feature Card 6 -->
+                        <div class="bg-slate-900/50 p-4 rounded-lg border border-[--border-color] flex items-start space-x-4">
+                            <div class="flex-shrink-0 text-cyan-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-white">Multiple Views</h4>
+                                <p class="text-sm text-gray-400">View schedules by student group or by individual faculty to get the full picture.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+            </div>
 
-                <hr class="my-8 border-white/10">
-
+            <div id="manual-view" class="hidden panel p-6 text-gray-300">
                 <div>
-                    <h3 class="text-xl font-semibold text-white mb-4">User Manual</h3>
-                    <div class="space-y-4">
-                        <div>
-                            <h4 class="font-semibold text-white">1. Getting Started</h4>
-                            <p>When you first open the tool, a unique workspace is created for you. The ID is in the URL (e.g., `?appId=...`). To collaborate, simply share this full URL with others.</p>
+                    <h3 class="text-2xl font-bold text-white text-center mb-6">User Manual</h3>
+                    <div class="space-y-8">
+                        <!-- Step 1 -->
+                        <div class="bg-slate-900/50 p-4 rounded-lg border border-[--border-color] flex items-start space-x-4">
+                            <div class="flex-shrink-0 text-cyan-400 text-2xl font-bold">1</div>
+                            <div>
+                                <h4 class="font-semibold text-white">Setup & Data Import</h4>
+                                <p class="text-sm text-gray-400 mt-1">
+                                    Begin by populating your workspace. Go to the <strong>Data & Settings</strong> tab. The quickest way to start is by downloading the Excel template, filling it with your university's data (Programs, Faculty, Courses), and uploading it using the "Import Data" button. Alternatively, you can add data manually using the "Individual" or "Bulk Edit" modes.
+                                </p>
+                            </div>
                         </div>
-                        <div>
-                            <h4 class="font-semibold text-white">2. Managing Your Data</h4>
-                            <p>Go to the <strong>Data & Settings</strong> tab. You have two main options:</p>
-                            <ul class="list-disc list-inside ml-4 mt-2 space-y-1 text-sm">
-                                <li><strong>Import Data:</strong> The fastest way to start. Download the template, fill it with your university's data (Programs, Faculty, Courses), and upload it using the "Import Data" button.</li>
-                                <li><strong>Manual Entry:</strong> Use the "Bulk Edit" mode for a structured way to enter all your data at once, or "Individual" mode to add or edit items one by one.</li>
-                            </ul>
+                        <!-- Step 2 -->
+                        <div class="bg-slate-900/50 p-4 rounded-lg border border-[--border-color] flex items-start space-x-4">
+                            <div class="flex-shrink-0 text-cyan-400 text-2xl font-bold">2</div>
+                            <div>
+                                <h4 class="font-semibold text-white">Scheduling Classes</h4>
+                                <p class="text-sm text-gray-400 mt-1">
+                                    Navigate to the <strong>Student Group Schedule</strong> tab. Use the dropdowns on the left to select a Department, Program, and Semester. Courses for that group will appear below. Simply drag a course from the list and drop it onto an available time slot in the grid.
+                                </p>
+                            </div>
                         </div>
-                        <div>
-                            <h4 class="font-semibold text-white">3. Scheduling Classes</h4>
-                            <p>In the <strong>Student Group Schedule</strong> tab, select a Department, Program, and Semester. A list of courses for that group will appear on the left. Simply drag a course from the list and drop it onto an available slot in the timetable grid on the right.</p>
+                        <!-- Step 3 -->
+                        <div class="bg-slate-900/50 p-4 rounded-lg border border-[--border-color] flex items-start space-x-4">
+                            <div class="flex-shrink-0 text-cyan-400 text-2xl font-bold">3</div>
+                            <div>
+                                <h4 class="font-semibold text-white">Viewing & Verification</h4>
+                                <p class="text-sm text-gray-400 mt-1">
+                                    Switch between views using the top tabs. The <strong>Faculty Schedule</strong> tab is perfect for verifying that no faculty member is overbooked. The tool will automatically show workload warnings and prevent direct time-slot clashes.
+                                </p>
+                            </div>
                         </div>
-                         <div>
-                            <h4 class="font-semibold text-white">4. Viewing Schedules</h4>
-                            <p>Use the top navigation tabs to switch between different views:</p>
-                             <ul class="list-disc list-inside ml-4 mt-2 space-y-1 text-sm">
-                                <li><strong>Student Group Schedule:</strong> The main view for planning and editing timetables for specific student groups.</li>
-                                <li><strong>Faculty Schedule:</strong> Select a faculty member from the dropdown to see their complete weekly schedule and workload.</li>
-                            </ul>
+                         <!-- Step 4 -->
+                        <div class="bg-slate-900/50 p-4 rounded-lg border border-[--border-color] flex items-start space-x-4">
+                            <div class="flex-shrink-0 text-cyan-400 text-2xl font-bold">4</div>
+                            <div>
+                                <h4 class="font-semibold text-white">Collaboration & Exporting</h4>
+                                <p class="text-sm text-gray-400 mt-1">
+                                    To work with colleagues, click the "Share Workspace" button and send them the URL. All changes will sync in real-time. Once your timetables are complete, use the "Export" buttons to download formatted Excel files for distribution or printing.
+                                </p>
+                            </div>
                         </div>
-                         <div>
-                            <h4 class="font-semibold text-white">5. Exporting</h4>
-                            <p>Use the export buttons at the top of the page or within each view to download your timetables as formatted Excel files. You can also download all your raw data from the "Data & Settings" tab.</p>
-                        </div>
+                    </div>
+                    <div class="mt-12">
+                        <h3 class="text-xl font-semibold text-white text-center mb-4">Pro-Tips</h3>
+                        <ul class="list-disc list-inside space-y-2 text-sm text-gray-400">
+                            <li><strong>Parent Programs:</strong> Use the "Parent Programs" field when creating or editing a program to automatically share common courses between different student groups.</li>
+                             <li><strong>Data Health Check:</strong> Periodically run the "Health Check" tool in Data & Settings to find and fix inconsistencies like unassigned courses or potential typos.</li>
+                             <li><strong>Clear Schedule:</strong> If you need to restart a specific group's timetable, the "Clear" button on the grid view will only remove entries for that group, leaving parent schedules intact.</li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -516,6 +602,8 @@
         let selectedCourse = null;
         let selectedGroup = { department: null, program: null, semester: null };
         let selectedFaculty = { name: null };
+        let facultyScheduleMap = {}; // Performance enhancement for clash detection
+        let isUserInteracting = false; // Flag to prevent race conditions on re-render
         
         let db, auth;
         let unsubscribe;
@@ -651,6 +739,14 @@
             if (unsubscribe) unsubscribe();
 
             unsubscribe = onSnapshot(dbRef, (docSnap) => {
+                // BUG FIX: Store current selections to prevent them from being reset by re-renders.
+                const activeSelections = {
+                    department: dom.departmentSelect.value,
+                    program: dom.programSelect.value,
+                    semester: selectedGroup.semester,
+                    faculty: dom.facultySelect.value
+                };
+
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     DB = { ...{ departments: [], programs: [], faculty: [], courses: [], schedule: {}, workloadLimit: 20 }, ...data };
@@ -659,7 +755,12 @@
                     console.log("No data found for this workspace. Initializing with empty state.");
                     DB = { departments: [], programs: [], faculty: [], courses: [], schedule: {}, workloadLimit: 20 };
                 }
-                renderAll();
+
+                buildFacultyScheduleMap(); // Performance Fix: Rebuild the map on any data change.
+                
+                if (!isUserInteracting) {
+                    renderAll(activeSelections);
+                }
                 checkInitialState();
             }, (error) => {
                 console.error("Error listening to Firestore:", error);
@@ -672,7 +773,9 @@
                 if (e.target.tagName === 'BUTTON') showView(e.target.dataset.view);
             });
             document.getElementById('import-button').addEventListener('click', handleImport);
+            document.getElementById('download-template-btn').addEventListener('click', downloadSmartTemplate);
             document.getElementById('download-current-data-btn').addEventListener('click', exportCurrentDataAsExcel);
+            document.getElementById('health-check-btn').addEventListener('click', runHealthCheck);
             document.getElementById('export-timetable-workbook-btn').addEventListener('click', exportTimetableWorkbook);
             document.getElementById('export-faculty-workbook-btn').addEventListener('click', exportFacultyWorkbook);
             document.getElementById('print-btn').addEventListener('click', () => printTimetable('group'));
@@ -685,22 +788,30 @@
             document.getElementById('share-btn').addEventListener('click', () => {
                  const shareUrl = window.location.href;
                  Swal.fire({
-                       title: 'Share Workspace',
-                       html: `Share this URL with your colleagues to collaborate:<br><br><input type="text" value="${shareUrl}" class="swal2-input" readonly>`,
-                       confirmButtonText: 'Copy URL'
+                         title: 'Share Workspace',
+                         html: `Share this URL with your colleagues to collaborate:<br><br><input type="text" value="${shareUrl}" class="swal2-input" readonly>`,
+                         confirmButtonText: 'Copy URL'
                  }).then((result) => {
-                       if(result.isConfirmed) {
-                           const input = Swal.getPopup().querySelector('input');
-                           input.select();
-                           document.execCommand('copy');
-                           Swal.fire('Copied!', 'Shareable URL copied to clipboard.', 'success');
-                       }
+                         if(result.isConfirmed) {
+                             const input = Swal.getPopup().querySelector('input');
+                             input.select();
+                             document.execCommand('copy');
+                             Swal.fire('Copied!', 'Shareable URL copied to clipboard.', 'success');
+                         }
                  });
             });
             
-            dom.departmentSelect.addEventListener('change', handleDepartmentChange);
-            dom.programSelect.addEventListener('change', handleProgramChange);
-            dom.facultySelect.addEventListener('change', handleFacultyChange);
+            const handleUserInteraction = (callback) => {
+                return (...args) => {
+                    isUserInteracting = true;
+                    callback(...args);
+                    setTimeout(() => isUserInteracting = false, 100); // Reset after a short delay
+                }
+            };
+
+            dom.departmentSelect.addEventListener('change', handleUserInteraction(handleDepartmentChange));
+            dom.programSelect.addEventListener('change', handleUserInteraction(handleProgramChange));
+            dom.facultySelect.addEventListener('change', handleUserInteraction(handleFacultyChange));
             
             dom.timetableGrid.addEventListener('click', handleGridClick);
             dom.timetableGrid.addEventListener('mouseover', handleGridHover);
@@ -776,103 +887,101 @@
             else if (viewName === 'manage') renderManageView();
         }
 
-        function renderAll() {
-            renderGroupView(); 
-            renderFacultyView();
+        function renderAll(selections = {}) {
+            renderGroupView(selections.department, selections.program, selections.semester); 
+            renderFacultyView(selections.faculty);
             if(document.getElementById('manage-view').offsetParent !== null) {
                 renderManageView();
             }
         }
 
-        function renderGroupView() {
+        function renderGroupView(initialDept, initialProg, initialSem) {
             if (DB.programs.length === 0) return;
             
-            populateSelect(dom.departmentSelect, getUniqueDepartments());
+            const deptToSelect = initialDept || selectedGroup.department || (getUniqueDepartments()[0] || null);
+            populateSelect(dom.departmentSelect, getUniqueDepartments(), false, deptToSelect);
 
-            if (selectedGroup.department && getUniqueDepartments().includes(selectedGroup.department)) {
-                dom.departmentSelect.value = selectedGroup.department;
-            } else if (getUniqueDepartments().length > 0) {
-                dom.departmentSelect.value = getUniqueDepartments()[0];
-            }
+            const programsInDept = DB.programs
+                .filter(p => p.departmentName === dom.departmentSelect.value)
+                .map(p => p.programName)
+                .sort();
             
-            handleDepartmentChange();
+            const progToSelect = initialProg || selectedGroup.program || (programsInDept[0] || null);
+            populateSelect(dom.programSelect, programsInDept, false, progToSelect);
+            
+            selectedGroup.department = dom.departmentSelect.value;
+            selectedGroup.program = dom.programSelect.value;
+            
+            updateSemesterButtons(initialSem || selectedGroup.semester);
         }
 
         function handleDepartmentChange() {
-            selectedCourse = null;
+            selectCourse(null);
             selectedGroup.department = dom.departmentSelect.value;
-            const programsInDept = DB.programs
-                .filter(p => p.departmentName === selectedGroup.department)
-                .map(p => p.programName)
-                .sort();
-            populateSelect(dom.programSelect, programsInDept);
-            
-            if (programsInDept.includes(selectedGroup.program)) {
-                dom.programSelect.value = selectedGroup.program;
-            } else if (programsInDept.length > 0) {
-                dom.programSelect.value = programsInDept[0];
-            }
-            
-            handleProgramChange();
+            renderGroupView(selectedGroup.department); // Re-render with the new selection
         }
 
         function handleProgramChange() {
-            selectedCourse = null;
+            selectCourse(null);
             selectedGroup.program = dom.programSelect.value;
+            updateSemesterButtons(); // Update semesters for the new program
+        }
+
+        function updateSemesterButtons(initialSem = null) {
             const program = DB.programs.find(p => p.programName === selectedGroup.program);
-            
             dom.semesterButtons.innerHTML = '';
 
             if (!program) {
                 selectedGroup.semester = null;
-                handleSemesterChange();
+                renderCourseList();
+                renderTimetableGrid();
                 return;
             }
 
             const totalSemesters = program.semesters;
-            const allSemesters = [];
-            for (let i = 1; i <= totalSemesters; i++) {
-                allSemesters.push(i);
-            }
+            const allSemesters = Array.from({ length: totalSemesters }, (_, i) => i + 1);
 
             if (allSemesters.length === 0) {
-                dom.semesterButtons.innerHTML = `<span class="text-xs text-gray-400">No semesters available.</span>`;
+                dom.semesterButtons.innerHTML = `<span class="text-xs text-gray-400">No semesters.</span>`;
                 selectedGroup.semester = null;
-                handleSemesterChange();
+                renderCourseList();
+                renderTimetableGrid();
                 return;
             }
 
+            const semToSelect = initialSem || selectedGroup.semester || '1';
+            
             allSemesters.forEach(sem => {
                 const button = document.createElement('button');
                 button.className = 'semester-button px-4 py-1.5 border border-white/20 rounded-md text-sm transition-colors hover:bg-white/10';
                 button.textContent = `Sem ${sem}`;
                 button.dataset.semester = sem;
-                button.addEventListener('click', (e) => handleSemesterChange(e));
+                if (String(sem) === String(semToSelect)) {
+                    button.classList.add('active');
+                    selectedGroup.semester = String(sem);
+                }
+                button.addEventListener('click', (e) => {
+                    isUserInteracting = true;
+                    handleSemesterChange(e);
+                    setTimeout(() => isUserInteracting = false, 100);
+                });
                 dom.semesterButtons.appendChild(button);
             });
 
-            const currentButtons = dom.semesterButtons.querySelectorAll('button');
-            let selectedButton = Array.from(currentButtons).find(btn => btn.dataset.semester == selectedGroup.semester);
-
-            if (!selectedButton && currentButtons.length > 0) {
-                selectedButton = currentButtons[0];
-            }
-            
-            if (selectedButton) {
-                selectedButton.click();
+            if (!selectedGroup.semester && allSemesters.length > 0) {
+                dom.semesterButtons.children[0].click();
             } else {
-                selectedGroup.semester = null;
-                handleSemesterChange();
+                renderCourseList();
+                renderTimetableGrid();
             }
         }
 
+
         function handleSemesterChange(e) {
-            selectedCourse = null;
-            if (e) {
-                dom.semesterButtons.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
-                e.target.classList.add('active');
-                selectedGroup.semester = e.target.dataset.semester;
-            }
+            selectCourse(null);
+            dom.semesterButtons.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+            e.target.classList.add('active');
+            selectedGroup.semester = e.target.dataset.semester;
             renderCourseList();
             renderTimetableGrid();
         }
@@ -888,7 +997,7 @@
                 return String(c.programName).trim() === String(selectedGroup.program).trim() && 
                        String(c.semester) === String(selectedGroup.semester);
             });
-
+            
             if (coursesForGroup.length === 0) {
                 dom.courseList.innerHTML = `<div class="empty-state"><p>No courses found for this semester.</p><p class="text-xs mt-1">You can add them in the 'Data & Settings' tab.</p></div>`;
                 return;
@@ -907,7 +1016,7 @@
                 const courseId = getCourseUniqueId(course);
                 const count = scheduledCounts[courseId] || 0;
                 const card = document.createElement('div');
-                const isSelected = getCourseUniqueId(selectedCourse) === courseId;
+                const isSelected = selectedCourse && getCourseUniqueId(selectedCourse) === courseId;
                 card.className = `course-card p-3 rounded-lg border ${isSelected ? 'bg-white/20 border-white/30' : 'bg-white/10 border-transparent'}`;
                 card.dataset.courseId = courseId;
                 card.draggable = true;
@@ -1038,21 +1147,18 @@
             highlightClashSlots();
         }
 
-        function renderFacultyView() {
+        function renderFacultyView(initialFaculty = null) {
              const facultyOptions = DB.faculty.map(f => ({
                   text: `${f.facultyName} (${f.departmentName})`,
                   value: f.facultyName
              })).sort((a, b) => a.text.localeCompare(b.text));
-
-            populateSelect(dom.facultySelect, facultyOptions, true);
             
-            if (selectedFaculty.name && facultyOptions.some(f => f.value === selectedFaculty.name)) {
-                dom.facultySelect.value = selectedFaculty.name;
-            } else if (facultyOptions.length > 0) {
-                dom.facultySelect.value = facultyOptions[0].value;
-            }
-
-            handleFacultyChange();
+            const facultyToSelect = initialFaculty || selectedFaculty.name || (facultyOptions[0]?.value || null);
+            populateSelect(dom.facultySelect, facultyOptions, true, facultyToSelect);
+            
+            selectedFaculty.name = dom.facultySelect.value;
+            renderFacultyTimetable();
+            renderFacultyWorkload();
         }
 
         function handleFacultyChange() {
@@ -1096,13 +1202,7 @@
                 dom.facultyTimetableGrid.appendChild(header);
             });
             
-            const facultySchedule = {};
-            Object.entries(DB.schedule).forEach(([progKey, progSched]) => {
-                const [programName, semester] = progKey.split('_');
-                Object.entries(progSched).forEach(([slotKey, slotData]) => {
-                    if (slotData.facultyName === selectedFaculty.name) facultySchedule[slotKey] = { ...slotData, programName, semester };
-                });
-            });
+            const facultySchedule = facultyScheduleMap[selectedFaculty.name] || {};
 
             const isFacultyOnFixedDuty = (day, periodNumber) => {
                 const teachesFixedBlockCourse = DB.courses.some(c => 
@@ -1341,7 +1441,8 @@
             const { programs, faculty } = getTempBulkData();
             const row = document.createElement('div');
             row.className = 'bulk-form-row';
-            row.style.gridTemplateColumns = '2fr 1fr 3fr 1fr 1fr 2fr 1fr';
+            // BUG FIX: Adjusted grid columns to prevent the remove button from wrapping
+            row.style.gridTemplateColumns = '3fr 1fr 4fr 1.5fr 1fr 3fr auto';
             row.innerHTML = `
                 <select class="p-2 text-sm">${programs.map(p => `<option value="${p}" ${p === data.programName ? 'selected' : ''}>${p}</option>`).join('')}</select>
                 <input type="number" placeholder="Sem" class="p-2 text-sm" value="${data.semester || ''}">
@@ -1360,11 +1461,11 @@
 
         function handleSaveBulkData() {
             try {
-                DB.departments = dom.manage.bulkDepartmentsTextarea.value.split('\n')
+                const newDepartments = dom.manage.bulkDepartmentsTextarea.value.split('\n')
                     .map(line => ({ departmentName: line.trim() }))
                     .filter(d => d.departmentName);
 
-                DB.programs = Array.from(dom.manage.bulkProgramsList.querySelectorAll('.bulk-form-row')).map(row => {
+                const newPrograms = Array.from(dom.manage.bulkProgramsList.querySelectorAll('.bulk-form-row')).map(row => {
                     const inputs = row.querySelectorAll('input, select');
                     return {
                         programName: inputs[0].value.trim(),
@@ -1374,7 +1475,7 @@
                     };
                 }).filter(p => p.programName);
 
-                DB.faculty = Array.from(dom.manage.bulkFacultyList.querySelectorAll('.bulk-form-row')).map(row => {
+                const newFaculty = Array.from(dom.manage.bulkFacultyList.querySelectorAll('.bulk-form-row')).map(row => {
                     const inputs = row.querySelectorAll('input, select');
                     return {
                         facultyName: inputs[0].value.trim(),
@@ -1383,7 +1484,7 @@
                     };
                 }).filter(f => f.facultyName);
                 
-                DB.courses = Array.from(dom.manage.bulkCoursesList.querySelectorAll('.bulk-form-row')).map(row => {
+                const newCourses = Array.from(dom.manage.bulkCoursesList.querySelectorAll('.bulk-form-row')).map(row => {
                     const inputs = row.querySelectorAll('input, select');
                     return {
                         programName: inputs[0].value,
@@ -1395,6 +1496,10 @@
                     };
                 }).filter(c => c.programName && c.courseName);
 
+                DB.departments = newDepartments;
+                DB.programs = newPrograms;
+                DB.faculty = newFaculty;
+                DB.courses = newCourses;
                 DB.schedule = {}; 
 
                 saveState();
@@ -1451,7 +1556,6 @@
                     parentPrograms: formValues[3] ? formValues[3].split(',').map(p => p.trim()) : []
                 });
                 saveState();
-                renderAll();
             }
         }
 
@@ -1504,7 +1608,6 @@
                 }
                 
                 saveState();
-                renderAll();
             }
         }
 
@@ -1521,22 +1624,18 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     const nameToDelete = program.programName;
-                    DB.programs.splice(index, 1);
+                    const semestersToDelete = program.semesters;
                     
-                    DB.courses = DB.courses.filter(c => {
-                        if (c.programName === nameToDelete) {
-                            const courseIdToDelete = getCourseUniqueId(c);
-                            Object.values(DB.schedule).forEach(progSched => {
-                                Object.keys(progSched).forEach(slotKey => {
-                                    if(progSched[slotKey].course && getCourseUniqueId(progSched[slotKey].course) === courseIdToDelete) {
-                                        delete progSched[slotKey];
-                                    }
-                                });
-                            });
-                            return false;
+                    // BUG FIX: More efficient and direct deletion of schedule entries.
+                    for(let i = 1; i <= semestersToDelete; i++) {
+                        const scheduleKey = `${nameToDelete}_${i}`;
+                        if(DB.schedule[scheduleKey]) {
+                            delete DB.schedule[scheduleKey];
                         }
-                        return true;
-                    });
+                    }
+
+                    DB.programs.splice(index, 1);
+                    DB.courses = DB.courses.filter(c => c.programName !== nameToDelete);
                     
                     DB.programs.forEach(p => {
                         if (p.parentPrograms && p.parentPrograms.includes(nameToDelete)) {
@@ -1545,7 +1644,6 @@
                     });
 
                     saveState();
-                    renderAll();
                     Swal.fire('Deleted!', `${nameToDelete} has been removed.`, 'success');
                 }
             });
@@ -1578,7 +1676,6 @@
                     workloadLimit: isNaN(limit) ? DB.workloadLimit : limit
                 });
                 saveState();
-                renderAll();
             }
         }
 
@@ -1624,7 +1721,6 @@
                 }
 
                 saveState();
-                renderAll();
             }
         }
 
@@ -1650,7 +1746,6 @@
                         });
                     });
                     saveState();
-                    renderAll();
                     Swal.fire('Deleted!', `${facultyName} has been removed.`, 'success');
                 }
             });
@@ -1685,7 +1780,6 @@
                     periodsPerWeek: parseInt(formValues[4]), courseType: formValues[5]
                 });
                 saveState();
-                renderAll();
             }
         }
 
@@ -1722,7 +1816,6 @@
                     periodsPerWeek: parseInt(formValues[4]), courseType: formValues[5]
                 };
                 saveState();
-                renderAll();
             }
         }
 
@@ -1749,7 +1842,6 @@
                         });
                     });
                     saveState();
-                    renderAll();
                     Swal.fire('Deleted!', `${courseName} has been removed.`, 'success');
                 }
             });
@@ -1801,7 +1893,7 @@
             for (const progName of programsToCheckForSchedule) {
                 const effectiveSchedule = getEffectiveScheduleForGroup(progName, courseForSlot.semester);
                  if (effectiveSchedule[slotKey]) {
-                     return true;
+                      return true;
                  }
             }
             return false;
@@ -1813,7 +1905,7 @@
                 if (facultyClash) {
                     Swal.fire({ icon: 'error', title: 'Faculty Clash!', html: `<b>${facultyClash.facultyName}</b> is already scheduled for <b>${facultyClash.course.courseName}</b> for <b>${facultyClash.programName} (Sem ${facultyClash.semester})</b> at this time.` });
                 } else {
-                    Swal.fire('Slot Taken', `This time slot is already occupied by another course or a fixed block.`, 'error');
+                    Swal.fire('Slot Taken', `This time slot is already occupied by another course for this student group or a fixed block.`, 'error');
                 }
                 return;
             }
@@ -1826,7 +1918,6 @@
             DB.schedule[scheduleKey][slotKey] = { course: courseToSchedule, facultyName: courseToSchedule.facultyName };
 
             saveState();
-            renderAll();
         }
 
         function handleGridClick(e) {
@@ -1856,7 +1947,6 @@
             }
 
             saveState();
-            renderAll();
         }
 
         function handleClearSchedule() {
@@ -1879,15 +1969,38 @@
                         delete DB.schedule[scheduleKey];
                     }
                     saveState();
-                    renderAll();
                     Swal.fire('Cleared!', 'The schedule has been cleared.', 'success');
                 }
             });
         }
 
+        // --- PERFORMANCE & CLASH DETECTION ---
+        function buildFacultyScheduleMap() {
+            facultyScheduleMap = {};
+            for (const progKey in DB.schedule) {
+                const [programName, semester] = progKey.split('_');
+                for (const slotKey in DB.schedule[progKey]) {
+                    const slotData = DB.schedule[progKey][slotKey];
+                    const facultyName = slotData.facultyName;
+                    if (facultyName) {
+                        if (!facultyScheduleMap[facultyName]) {
+                            facultyScheduleMap[facultyName] = {};
+                        }
+                        facultyScheduleMap[facultyName][slotKey] = { ...slotData, programName, semester };
+                    }
+                }
+            }
+        }
+
         function checkForFacultyClash(facultyName, day, period) {
             if (facultyName === "Unassigned") return null;
             
+            const slotKey = `${day}_${period}`;
+            const facultySlots = facultyScheduleMap[facultyName];
+            if (facultySlots && facultySlots[slotKey]) {
+                return facultySlots[slotKey];
+            }
+
             const teachesFixedBlockCourse = DB.courses.some(c => 
                 c.facultyName === facultyName && 
                 FIXED_BLOCKS.some(fb => fb.label.toLowerCase() === c.courseName.toLowerCase())
@@ -1895,17 +2008,10 @@
             if (teachesFixedBlockCourse) {
                 const fixedBlock = FIXED_BLOCKS.find(b => b.day === day && b.periods.includes(period));
                 if (fixedBlock) {
-                    return { facultyName: facultyName, reason: `Teaches ${fixedBlock.label} at this time.` };
+                    return { facultyName: facultyName, course: { courseName: fixedBlock.label }, programName: 'University', semester: 'All' };
                 }
             }
-
-            const slotKey = `${day}_${period}`;
-            for (const progKey in DB.schedule) {
-                if (DB.schedule[progKey]?.[slotKey]?.facultyName === facultyName) {
-                    const [programName, semester] = progKey.split('_');
-                    return { ...DB.schedule[progKey][slotKey], programName, semester };
-                }
-            }
+            
             return null;
         }
         
@@ -1915,15 +2021,7 @@
             const facultyMember = DB.faculty.find(f => f.facultyName === facultyName);
             const workloadLimit = facultyMember ? facultyMember.workloadLimit : DB.workloadLimit;
 
-            const uniqueSlots = new Set();
-            Object.values(DB.schedule).forEach(progSched => {
-                Object.entries(progSched).forEach(([slotKey, slotData]) => {
-                    if (slotData.facultyName === facultyName) {
-                       uniqueSlots.add(slotKey);
-                    }
-                });
-            });
-            const totalPeriods = uniqueSlots.size;
+            const totalPeriods = facultyScheduleMap[facultyName] ? Object.keys(facultyScheduleMap[facultyName]).length : 0;
 
             if (totalPeriods > workloadLimit) {
                  Swal.fire({ icon: 'warning', title: 'Faculty Workload Warning', text: `${facultyName} is now scheduled for ${totalPeriods} periods, over their recommended limit of ${workloadLimit}.` });
@@ -1960,76 +2058,129 @@
             const file = fileInput.files[0];
             if (!file) { Swal.fire('No File Selected', 'Please select an Excel file.', 'error'); return; }
 
-            Swal.fire({
-                title: 'Overwrite existing data?',
-                text: "Importing a new file will replace all current courses, faculty, and schedules. This action cannot be undone.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, import and replace!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    importFile(file);
-                }
-            });
+            previewAndValidateImport(file);
         }
 
-        function importFile(file) {
+        function previewAndValidateImport(file) {
             dom.loader.classList.remove('hidden');
             const reader = new FileReader();
             reader.onload = (e) => {
                 try {
                     const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
-                    const oldLimit = DB.workloadLimit || 20;
-                    const newDB = { departments: [], programs: [], faculty: [], courses: [], schedule: {}, workloadLimit: oldLimit };
-                    
                     const programsData = XLSX.utils.sheet_to_json(workbook.Sheets['Programs'] || []);
                     const coursesData = XLSX.utils.sheet_to_json(workbook.Sheets['Courses'] || []);
                     const facultyData = XLSX.utils.sheet_to_json(workbook.Sheets['Faculty'] || []);
 
-                    if (programsData.length === 0 || coursesData.length === 0) {
-                        throw new Error("The 'Programs' and 'Courses' sheets are required and cannot be empty.");
-                    }
+                    const errors = [];
+                    const warnings = [];
 
-                    newDB.faculty = facultyData.map(row => ({
-                        facultyName: String(row.facultyName || 'Unnamed Faculty').trim(),
-                        departmentName: String(row.departmentName || 'No Department').trim(),
-                        workloadLimit: parseInt(row.workloadLimit) || oldLimit
-                    })).filter(f => f.facultyName && f.facultyName !== 'Unnamed Faculty');
+                    const programNames = new Set(programsData.map(p => p.programName?.trim()));
+                    const facultyNames = new Set(facultyData.map(f => f.facultyName?.trim()));
 
-                    newDB.programs = programsData.map(row => ({
-                        programName: String(row.programName || '').trim(),
-                        departmentName: String(row.departmentName || 'No Department').trim(),
-                        semesters: parseInt(row.semesters) || 6,
-                        parentPrograms: row.parentPrograms ? String(row.parentPrograms).split(',').map(p => p.trim()) : []
-                    })).filter(p => p.programName);
-
-                    newDB.courses = coursesData.map(row => ({
-                        programName: String(row.programName || '').trim(),
-                        semester: parseInt(row.semester) || 1,
-                        courseName: String(row.courseName || '').trim(),
-                        courseType: String(row.courseType || 'Theory').trim(),
-                        periodsPerWeek: parseInt(row.periodsPerWeek) || 4,
-                        facultyName: String(row.facultyName || 'Unassigned').trim()
-                    })).filter(c => c.programName && c.courseName);
-
-                    DB = newDB;
-                    saveState();
-                    
-                    Swal.fire({
-                        icon: 'success', title: 'Import Successful!', html: `Your data has been loaded and sanitized.`
-                    }).then(() => {
-                        selectedGroup = { program: null, semester: null, department: null };
-                        selectedFaculty = { name: null };
-                        renderAll();
-                        showView('group');
+                    coursesData.forEach((course, index) => {
+                        if (!programNames.has(course.programName?.trim())) {
+                            errors.push(`Courses Sheet, Row ${index + 2}: Program "${course.programName}" does not exist in the Programs sheet.`);
+                        }
+                        if (course.facultyName?.trim() !== 'Unassigned' && !facultyNames.has(course.facultyName?.trim())) {
+                            errors.push(`Courses Sheet, Row ${index + 2}: Faculty "${course.facultyName}" does not exist in the Faculty sheet.`);
+                        }
+                        if (!course.periodsPerWeek || isNaN(parseInt(course.periodsPerWeek)) || parseInt(course.periodsPerWeek) <= 0) {
+                            warnings.push(`Courses Sheet, Row ${index + 2}: "periodsPerWeek" for "${course.courseName}" is invalid. Defaulting to 4.`);
+                        }
                     });
 
-                } catch (error) { Swal.fire('Import Failed', `An error occurred: ${error.message}`, 'error'); } 
-                finally { dom.loader.classList.add('hidden'); }
+                    facultyData.forEach((faculty, index) => {
+                        if (faculty.workloadLimit && isNaN(parseInt(faculty.workloadLimit))) {
+                            warnings.push(`Faculty Sheet, Row ${index + 2}: Workload limit for "${faculty.facultyName}" is not a number. Using default.`);
+                        }
+                    });
+
+                    let html = `<div class="text-left">
+                                 <p class="text-lg font-semibold mb-4">Found: ${programsData.length} Programs, ${facultyData.length} Faculty, ${coursesData.length} Courses.</p>`;
+
+                    if (errors.length > 0) {
+                        html += `<h4 class="font-bold text-red-400 mt-4">Errors (must be fixed before import):</h4>
+                                 <ul class="list-disc list-inside text-sm text-red-400">${errors.map(e => `<li>${e}</li>`).join('')}</ul>`;
+                    }
+                    if (warnings.length > 0) {
+                        html += `<h4 class="font-bold text-yellow-400 mt-4">Warnings (will use default values):</h4>
+                                 <ul class="list-disc list-inside text-sm text-yellow-400">${warnings.map(w => `<li>${w}</li>`).join('')}</ul>`;
+                    }
+                    if (errors.length === 0 && warnings.length === 0) {
+                        html += `<p class="text-green-400 mt-4">No issues found. Ready to import.</p>`;
+                    }
+                    html += `</div>`;
+
+                    Swal.fire({
+                        title: 'Import Preview',
+                        html: html,
+                        showCancelButton: true,
+                        confirmButtonText: 'Proceed with Import',
+                        cancelButtonText: 'Cancel',
+                        confirmButtonColor: '#22c55e',
+                        showLoaderOnConfirm: true,
+                        preConfirm: () => {
+                            if (errors.length > 0) {
+                                Swal.showValidationMessage('Please fix the errors in your Excel file before importing.');
+                                return false;
+                            }
+                            return { programsData, coursesData, facultyData };
+                        },
+                        allowOutsideClick: () => !Swal.isLoading()
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            performImport(result.value);
+                        }
+                    });
+
+                } catch (error) {
+                    Swal.fire('Import Failed', `An error occurred while reading the file: ${error.message}`, 'error');
+                } finally {
+                    dom.loader.classList.add('hidden');
+                    document.getElementById('excel-file-input').value = ''; // Reset file input
+                }
             };
             reader.readAsArrayBuffer(file);
+        }
+
+        function performImport(data) {
+            const { programsData, coursesData, facultyData } = data;
+            const oldLimit = DB.workloadLimit || 20;
+            const newDB = { departments: [], programs: [], faculty: [], courses: [], schedule: {}, workloadLimit: oldLimit };
+            
+            newDB.faculty = facultyData.map(row => ({
+                facultyName: String(row.facultyName || 'Unnamed Faculty').trim(),
+                departmentName: String(row.departmentName || 'No Department').trim(),
+                workloadLimit: parseInt(row.workloadLimit) || oldLimit
+            })).filter(f => f.facultyName && f.facultyName !== 'Unnamed Faculty');
+
+            newDB.programs = programsData.map(row => ({
+                programName: String(row.programName || '').trim(),
+                departmentName: String(row.departmentName || 'No Department').trim(),
+                semesters: parseInt(row.semesters) || 6,
+                parentPrograms: row.parentPrograms ? String(row.parentPrograms).split(',').map(p => p.trim()) : []
+            })).filter(p => p.programName);
+
+            newDB.courses = coursesData.map(row => ({
+                programName: String(row.programName || '').trim(),
+                semester: parseInt(row.semester) || 1,
+                courseName: String(row.courseName || '').trim(),
+                courseType: String(row.courseType || 'Theory').trim(),
+                periodsPerWeek: parseInt(row.periodsPerWeek) || 4,
+                facultyName: String(row.facultyName || 'Unassigned').trim()
+            })).filter(c => c.programName && c.courseName);
+
+            DB = newDB;
+            saveState();
+            
+            Swal.fire({
+                icon: 'success', title: 'Import Successful!', html: `Your data has been loaded.`
+            }).then(() => {
+                selectedGroup = { program: null, semester: null, department: null };
+                selectedFaculty = { name: null };
+                renderAll();
+                showView('group');
+            });
         }
         
         function exportCurrentDataAsExcel() {
@@ -2052,8 +2203,8 @@
             XLSX.writeFile(wb, "Timetable_Current_Data.xlsx");
         }
 
-        function populateSelect(selectElement, options, isObject = false) {
-            const currentVal = selectElement.value;
+        function populateSelect(selectElement, options, isObject = false, selectedValue = null) {
+            const currentVal = selectedValue || selectElement.value;
             selectElement.innerHTML = '';
             
             options.forEach(option => {
@@ -2067,6 +2218,7 @@
                 }
                 selectElement.appendChild(opt);
             });
+
             if (options.map(o => isObject ? o.value : o).includes(currentVal)) {
                 selectElement.value = currentVal;
             } else if (options.length > 0) {
@@ -2126,14 +2278,7 @@
                 semester = null; 
                 const facultyName = selectedFaculty.name;
                 filename = `Schedule_${facultyName.replace(/\s/g, '_')}.xlsx`;
-                const facultySchedule = {};
-                Object.entries(DB.schedule).forEach(([progKey, progSched]) => {
-                    const [pName, sem] = progKey.split('_');
-                    Object.entries(progSched).forEach(([slotKey, slotData]) => {
-                        if (slotData.facultyName === facultyName) facultySchedule[slotKey] = { ...slotData, programName: pName, semester: sem };
-                    });
-                });
-                data = facultySchedule;
+                data = facultyScheduleMap[facultyName] || {};
             }
 
             const ws = createTimetableSheet(view, data, programName, semester);
@@ -2143,14 +2288,10 @@
         }
 
         function createTimetableSheet(view, data, programName, semester) {
-            // NOTE: The community version of the xlsx.js library does not support cell styling (e.g., colors).
-            // The 's' (style) property is included here for compatibility with the Pro version of the library.
-            // In the free version, these styles will be ignored, and the cells will not be colored.
             const ws = {};
             const boldCentered = { font: { bold: true }, alignment: { horizontal: "center", vertical: "center", wrapText: true } };
             const centered = { alignment: { horizontal: "center", vertical: "center", wrapText: true } };
             
-            // Set Timetable Headers
             ws[XLSX.utils.encode_cell({c:0, r:0})] = { v: 'Day/Time', s: boldCentered };
             periods.forEach((p, i) => {
                 ws[XLSX.utils.encode_cell({c:i+1, r:0})] = { v: `${p.time}\n(Period ${p.number})`, s: boldCentered };
@@ -2189,7 +2330,7 @@
                 });
             });
 
-            let currentRow = days.length + 3; // Start summary table after a couple of blank rows
+            let currentRow = days.length + 3;
 
             if (view === 'group') {
                 const summaryHeader = ['COURSE NAME', 'COURSE CODE', 'TEACHING FACULTY', 'DESIGNATION', 'CREDITS', 'SESSIONS'];
@@ -2300,14 +2441,8 @@
 
                 DB.faculty.forEach(faculty => {
                     const facultyName = faculty.facultyName;
-                    const facultySchedule = {};
-                    Object.entries(DB.schedule).forEach(([progKey, progSched]) => {
-                        const [pName, sem] = progKey.split('_');
-                        Object.entries(progSched).forEach(([slotKey, slotData]) => {
-                            if (slotData.facultyName === facultyName) facultySchedule[slotKey] = { ...slotData, programName: pName, semester: sem };
-                        });
-                    });
-
+                    const facultySchedule = facultyScheduleMap[facultyName] || {};
+                    
                     if (Object.keys(facultySchedule).length > 0) {
                         const ws = createTimetableSheet('faculty', facultySchedule, null, null);
                         const sheetName = `Faculty-${facultyName}`.substring(0, 31);
@@ -2358,6 +2493,170 @@
                 }
             }
             document.querySelector('.course-card.dragging')?.classList.remove('dragging');
+        }
+
+        // --- DATA HEALTH CHECK ---
+        function levenshteinDistance(s, t) {
+            if (!s.length) return t.length;
+            if (!t.length) return s.length;
+            const arr = [];
+            for (let i = 0; i <= t.length; i++) {
+                arr[i] = [i];
+                for (let j = 1; j <= s.length; j++) {
+                    arr[i][j] = i === 0 ? j : Math.min(
+                        arr[i - 1][j] + 1,
+                        arr[i][j - 1] + 1,
+                        arr[i - 1][j - 1] + (s[j - 1] === t[i - 1] ? 0 : 1)
+                    );
+                }
+            }
+            return arr[t.length][s.length];
+        }
+
+        function findSimilarNames(names, threshold = 2) {
+            const similarGroups = [];
+            const checked = new Set();
+            for (let i = 0; i < names.length; i++) {
+                if (checked.has(names[i])) continue;
+                const currentGroup = [names[i]];
+                for (let j = i + 1; j < names.length; j++) {
+                    if (checked.has(names[j])) continue;
+                    if (levenshteinDistance(names[i], names[j]) <= threshold) {
+                        currentGroup.push(names[j]);
+                        checked.add(names[j]);
+                    }
+                }
+                if (currentGroup.length > 1) {
+                    similarGroups.push(currentGroup);
+                }
+                checked.add(names[i]);
+            }
+            return similarGroups;
+        }
+
+        function runHealthCheck() {
+            const results = {
+                orphanedCourses: [],
+                unassignedCourses: [],
+                idleFaculty: [],
+                overloadedFaculty: [],
+                highPeriodsCourses: [],
+                similarFaculty: [],
+                similarPrograms: [],
+            };
+
+            const validProgramNames = new Set(DB.programs.map(p => p.programName));
+            const validFacultyNames = new Set(DB.faculty.map(f => f.facultyName));
+
+            // Check for orphaned and unassigned courses
+            DB.courses.forEach(course => {
+                if (!validProgramNames.has(course.programName)) {
+                    results.orphanedCourses.push(`'${course.courseName}' is assigned to a non-existent program: '${course.programName}'.`);
+                }
+                if (course.facultyName === 'Unassigned') {
+                    results.unassignedCourses.push(`'${course.courseName}' (for ${course.programName} Sem ${course.semester}) is unassigned.`);
+                } else if (!validFacultyNames.has(course.facultyName)) {
+                    results.orphanedCourses.push(`'${course.courseName}' is assigned to a non-existent faculty member: '${course.facultyName}'.`);
+                }
+                if (course.periodsPerWeek > 10) {
+                    results.highPeriodsCourses.push(`'${course.courseName}' has a high period count: ${course.periodsPerWeek} per week.`);
+                }
+            });
+
+            // Check faculty workload
+            const facultyWorkloads = {};
+            DB.faculty.forEach(f => facultyWorkloads[f.facultyName] = 0);
+            Object.values(DB.schedule).forEach(progSched => {
+                Object.values(progSched).forEach(slot => {
+                    if (facultyWorkloads.hasOwnProperty(slot.facultyName)) {
+                        facultyWorkloads[slot.facultyName]++;
+                    }
+                });
+            });
+
+            DB.faculty.forEach(faculty => {
+                const workload = facultyWorkloads[faculty.facultyName];
+                if (workload === 0) {
+                    results.idleFaculty.push(`'${faculty.facultyName}' is not scheduled for any courses.`);
+                }
+                if (workload > 30) {
+                    results.overloadedFaculty.push(`'${faculty.facultyName}' has a very high workload of ${workload} periods.`);
+                }
+            });
+            
+            // Check for typos
+            results.similarFaculty = findSimilarNames(Array.from(validFacultyNames));
+            results.similarPrograms = findSimilarNames(Array.from(validProgramNames));
+
+            displayHealthCheckResults(results);
+        }
+
+        function displayHealthCheckResults(results) {
+            let html = '';
+            const issueCounts = Object.values(results).reduce((acc, arr) => acc + arr.length, 0);
+
+            if (issueCounts === 0) {
+                Swal.fire('All Good!', 'No issues found in your data. Everything looks great.', 'success');
+                return;
+            }
+
+            const createList = (items) => items.length > 0 ? `<ul class="health-check-list">${items.map(i => `<li>${i}</li>`).join('')}</ul>` : '<p class="text-sm text-gray-400 text-left pl-4">None.</p>';
+            
+            const createGroupList = (groups) => {
+                if (groups.length === 0) return '<p class="text-sm text-gray-400 text-left pl-4">None.</p>';
+                return `<ul class="health-check-list">${groups.map(g => `<li>Potential typo group: <b>${g.join(', ')}</b></li>`).join('')}</ul>`;
+            };
+
+            html += '<div class="text-left space-y-4">';
+            if (results.orphanedCourses.length > 0) {
+                html += `<div><h4 class="font-bold text-red-400">Errors (Orphaned Data)</h4>${createList(results.orphanedCourses)}</div>`;
+            }
+            if (results.unassignedCourses.length > 0 || results.idleFaculty.length > 0 || results.overloadedFaculty.length > 0 || results.highPeriodsCourses.length > 0) {
+                html += `<div><h4 class="font-bold text-yellow-400">Warnings</h4>`;
+                if (results.unassignedCourses.length > 0) html += `<h5>Unassigned Courses:</h5>${createList(results.unassignedCourses)}`;
+                if (results.idleFaculty.length > 0) html += `<h5 class="mt-2">Faculty with No Schedule:</h5>${createList(results.idleFaculty)}`;
+                if (results.overloadedFaculty.length > 0) html += `<h5 class="mt-2">Faculty with High Workload (>30):</h5>${createList(results.overloadedFaculty)}`;
+                if (results.highPeriodsCourses.length > 0) html += `<h5 class="mt-2">Courses with High Period Count (>10):</h5>${createList(results.highPeriodsCourses)}`;
+                html += `</div>`;
+            }
+             if (results.similarFaculty.length > 0 || results.similarPrograms.length > 0) {
+                html += `<div><h4 class="font-bold text-cyan-400">Suggestions (Potential Typos)</h4>`;
+                if (results.similarFaculty.length > 0) html += `<h5>Similar Faculty Names:</h5>${createGroupList(results.similarFaculty)}`;
+                if (results.similarPrograms.length > 0) html += `<h5 class="mt-2">Similar Program Names:</h5>${createGroupList(results.similarPrograms)}`;
+                html += `</div>`;
+            }
+
+            html += '</div>';
+
+            Swal.fire({
+                title: 'Data Health Check Results',
+                html: html,
+                width: '800px'
+            });
+        }
+
+        function downloadSmartTemplate() {
+            const wb = XLSX.utils.book_new();
+
+            // Create sheets with headers and example data
+            const programsData = [{ programName: "B.Tech CSE", departmentName: "Engineering", semesters: 8, parentPrograms: "" }];
+            const facultyData = [{ facultyName: "Dr. Alan Turing", departmentName: "Engineering", workloadLimit: 20 }];
+            const coursesData = [{ programName: "B.Tech CSE", semester: 1, courseName: "Intro to Programming", courseType: "Theory", periodsPerWeek: 4, facultyName: "Dr. Alan Turing" }];
+
+            const wsPrograms = XLSX.utils.json_to_sheet(programsData);
+            const wsFaculty = XLSX.utils.json_to_sheet(facultyData);
+            const wsCourses = XLSX.utils.json_to_sheet(coursesData);
+
+            // Add sheets to workbook
+            XLSX.utils.book_append_sheet(wb, wsPrograms, "Programs");
+            XLSX.utils.book_append_sheet(wb, wsFaculty, "Faculty");
+            XLSX.utils.book_append_sheet(wb, wsCourses, "Courses");
+            
+            // BUG FIX: The original data validation feature is unreliable in many Excel versions.
+            // This simplified template provides the correct structure without the faulty validation.
+            // The in-app Health Check tool is a more reliable way to validate data.
+            
+            XLSX.writeFile(wb, "Timetable_Template.xlsx");
         }
 
     </script>

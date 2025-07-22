@@ -223,13 +223,13 @@
             <h1 class="text-3xl font-bold text-white">Medhavi Skills University Timetable Planning Tool</h1>
             <p class="text-gray-400 mt-1">Automated clash detection with custom faculty workload warnings.</p>
              <div id="collab-info" class="mt-4 text-xs text-gray-400">
-                 <p>Workspace ID: <span id="user-id-display" class="font-mono"></span></p>
-                 <div class="mt-4 flex justify-center items-center space-x-4">
-                     <button id="share-btn" class="px-4 py-2 bg-white/10 rounded-lg hover:bg-white/20 transition" title="Share a link to this workspace for collaboration">Share Workspace</button>
-                     <button id="export-timetable-workbook-btn" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors flex-shrink-0" title="Export all program timetables to an Excel workbook">Export Timetables</button>
-                     <button id="export-faculty-workbook-btn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex-shrink-0" title="Export all faculty schedules to an Excel workbook">Export Faculty Schedules</button>
-                 </div>
-            </div>
+                  <p>Workspace ID: <span id="user-id-display" class="font-mono"></span></p>
+                  <div class="mt-4 flex justify-center items-center space-x-4">
+                       <button id="share-btn" class="px-4 py-2 bg-white/10 rounded-lg hover:bg-white/20 transition" title="Share a link to this workspace for collaboration">Share Workspace</button>
+                       <button id="export-timetable-workbook-btn" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors flex-shrink-0" title="Export all program timetables to an Excel workbook">Export Timetables</button>
+                       <button id="export-faculty-workbook-btn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex-shrink-0" title="Export all faculty schedules to an Excel workbook">Export Faculty Schedules</button>
+                  </div>
+             </div>
         </header>
 
         <div class="mb-8">
@@ -269,14 +269,14 @@
                         <input type="file" id="excel-file-input" accept=".xlsx, .xls" class="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-white/10 file:text-white hover:file:bg-white/20"/>
                         <button id="import-button" class="px-4 py-2 bg-[--main-color] text-white rounded-lg hover:bg-cyan-700 transition-colors flex-shrink-0" title="Import data from a multi-sheet Excel file. This will overwrite existing data.">Import Data</button>
                    </div>
-                    <div class="mt-4 flex items-center space-x-4">
+                   <div class="mt-4 flex items-center space-x-4">
                         <button id="download-template-btn" class="text-sm text-cyan-400 hover:underline" title="Download an Excel template with pre-configured data validation rules">Download Template</button>
                         <button id="download-current-data-btn" class="text-sm text-amber-400 hover:underline" title="Download all current data as a re-uploadable Excel file">Download All Data as Excel</button>
                         <button id="health-check-btn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2" title="Scan all data for potential issues like orphans, missing assignments, and typos.">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10c0-4.42-2.87-8.17-6.84-9.5c-.5-.1-.96-.6-.96-1.12V1.2A10 10 0 0 0 12 2z"/><path d="m22 2-4.24 4.24"/><path d="m7.16 14.84 5.66-5.66"/></svg>
                             Run Data Health Check
                         </button>
-                    </div>
+                   </div>
                  </div>
 
                  <div class="bg-slate-900/50 p-4 rounded-lg border border-[--border-color] mb-8">
@@ -389,6 +389,7 @@
                             <div>
                                 <label for="program-select" class="block text-sm font-medium text-gray-300">Program</label>
                                 <select id="program-select" class="mt-1 block w-full pl-3 pr-10 py-2 text-base focus:outline-none sm:text-sm rounded-md"></select>
+                                <div id="parent-program-display" class="mt-2 text-xs hidden"></div>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-300">Semester</label>
@@ -644,6 +645,7 @@
             hoverTooltip: document.getElementById('hover-tooltip'),
             departmentSelect: document.getElementById('department-select'),
             programSelect: document.getElementById('program-select'),
+            parentProgramDisplay: document.getElementById('parent-program-display'),
             semesterButtons: document.getElementById('semester-buttons'),
             courseList: document.getElementById('course-list'),
             timetableGrid: document.getElementById('timetable-grid'),
@@ -933,6 +935,90 @@
                 renderManageView();
             }
         }
+        
+        // --- MODIFICATION: Replaced the previous hierarchical function with a more robust version ---
+        function populateHierarchicalProgramSelect(programsInDept, selectedValue) {
+            const selectElement = dom.programSelect;
+            selectElement.innerHTML = '';
+
+            if (!programsInDept || programsInDept.length === 0) {
+                return;
+            }
+
+            const allPrograms = DB.programs;
+            const programObjectsInDept = allPrograms.filter(p => programsInDept.includes(p.programName));
+
+            // Create a map of parent -> children[] for all programs
+            const childrenMap = new Map();
+            allPrograms.forEach(p => {
+                if (p.parentPrograms && p.parentPrograms.length > 0) {
+                    p.parentPrograms.forEach(parentName => {
+                        if (!childrenMap.has(parentName)) {
+                            childrenMap.set(parentName, []);
+                        }
+                        childrenMap.get(parentName).push(p.programName);
+                    });
+                }
+            });
+
+            // Identify top-level programs for the current department
+            // A program is top-level if it's a parent OR if it's not a child of any other program.
+            const topLevelProgramsInDept = programObjectsInDept
+                .filter(p => {
+                    const isParent = childrenMap.has(p.programName);
+                    const isChild = allPrograms.some(other => (other.parentPrograms || []).includes(p.programName));
+                    return isParent || !isChild;
+                })
+                .sort((a, b) => a.programName.localeCompare(b.programName));
+
+            const addedPrograms = new Set(); // Keep track of programs added to avoid duplicates from multiple parents
+
+            // Recursive function to add options to the select element
+            const addOption = (program, depth) => {
+                if (depth === 0) {
+                    if (addedPrograms.has(program.programName)) return;
+                    addedPrograms.add(program.programName);
+                }
+
+                const opt = document.createElement('option');
+                opt.value = program.programName;
+
+                let label = ' '.repeat(depth * 4);
+                if (depth > 0) {
+                    label += '↳ '; // Indentation for children
+                }
+                label += program.programName;
+
+                if (childrenMap.has(program.programName)) {
+                    opt.style.fontWeight = 'bold';
+                    opt.style.color = '#a78bfa'; // Highlight parents
+                    label += ' (Parent)';
+                }
+
+                opt.innerHTML = label.replace(/ /g, '&nbsp;');
+                selectElement.appendChild(opt);
+
+                // Find and add children that are in the current department
+                const childrenNames = (childrenMap.get(program.programName) || []).sort();
+                childrenNames.forEach(childName => {
+                    const childProgram = allPrograms.find(p => p.programName === childName);
+                    if (childProgram && programsInDept.includes(childName)) {
+                        addOption(childProgram, depth + 1);
+                    }
+                });
+            };
+
+            // Build the dropdown from the top-level programs
+            topLevelProgramsInDept.forEach(p => addOption(p, 0));
+
+            // Set the selected value
+            if (selectedValue && programsInDept.includes(selectedValue)) {
+                selectElement.value = selectedValue;
+            } else if (topLevelProgramsInDept.length > 0) {
+                selectElement.value = topLevelProgramsInDept[0].programName;
+            }
+        }
+        // --- END MODIFICATION ---
 
         function renderGroupView(initialDept, initialProg, initialSem) {
             if (DB.programs.length === 0) return;
@@ -942,11 +1028,12 @@
 
             const programsInDept = DB.programs
                 .filter(p => p.departmentName === dom.departmentSelect.value)
-                .map(p => p.programName)
-                .sort();
+                .map(p => p.programName);
             
             const progToSelect = initialProg || selectedGroup.program || (programsInDept[0] || null);
-            populateSelect(dom.programSelect, programsInDept, false, progToSelect);
+            
+            // Use the new hierarchical function to populate the dropdown
+            populateHierarchicalProgramSelect(programsInDept, progToSelect);
             
             selectedGroup.department = dom.departmentSelect.value;
             selectedGroup.program = dom.programSelect.value;
@@ -969,7 +1056,23 @@
         function updateSemesterButtons(initialSem = null) {
             const program = DB.programs.find(p => p.programName === selectedGroup.program);
             dom.semesterButtons.innerHTML = '';
+            const parentDisplay = dom.parentProgramDisplay;
 
+            if (program && program.parentPrograms && program.parentPrograms.length > 0) {
+                parentDisplay.innerHTML = `
+                    <div class="p-2 bg-slate-900/50 rounded-md border border-white/10">
+                        <span class="font-semibold text-gray-300">Common Schedule With:</span>
+                        <ul class="list-disc list-inside text-gray-400 mt-1 pl-2">
+                            ${program.parentPrograms.map(p => `<li>${p}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+                parentDisplay.classList.remove('hidden');
+            } else {
+                parentDisplay.innerHTML = '';
+                parentDisplay.classList.add('hidden');
+            }
+            
             if (!program) {
                 selectedGroup.semester = null;
                 renderCourseList();
@@ -2135,15 +2238,15 @@
                     });
 
                     let html = `<div class="text-left">
-                                 <p class="text-lg font-semibold mb-4">Found: ${programsData.length} Programs, ${facultyData.length} Faculty, ${coursesData.length} Courses.</p>`;
+                                     <p class="text-lg font-semibold mb-4">Found: ${programsData.length} Programs, ${facultyData.length} Faculty, ${coursesData.length} Courses.</p>`;
 
                     if (errors.length > 0) {
                         html += `<h4 class="font-bold text-red-400 mt-4">Errors (must be fixed before import):</h4>
-                                 <ul class="list-disc list-inside text-sm text-red-400">${errors.map(e => `<li>${e}</li>`).join('')}</ul>`;
+                                     <ul class="list-disc list-inside text-sm text-red-400">${errors.map(e => `<li>${e}</li>`).join('')}</ul>`;
                     }
                     if (warnings.length > 0) {
                         html += `<h4 class="font-bold text-yellow-400 mt-4">Warnings (will use default values):</h4>
-                                 <ul class="list-disc list-inside text-sm text-yellow-400">${warnings.map(w => `<li>${w}</li>`).join('')}</ul>`;
+                                     <ul class="list-disc list-inside text-sm text-yellow-400">${warnings.map(w => `<li>${w}</li>`).join('')}</ul>`;
                     }
                     if (errors.length === 0 && warnings.length === 0) {
                         html += `<p class="text-green-400 mt-4">No issues found. Ready to import.</p>`;

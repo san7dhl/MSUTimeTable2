@@ -35,7 +35,7 @@
         .timetable-grid {
             display: grid;
             grid-template-columns: 80px repeat(8, 1fr);
-            grid-template-rows: 40px repeat(5, 80px);
+            grid-template-rows: 40px repeat(6, 80px);
             gap: 4px;
         }
         .grid-header {
@@ -620,7 +620,7 @@
         let unsubscribe;
         let currentAppId;
 
-        const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+        const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         const periods = [
             { number: 1, time: '09:30-10:20' }, { number: 2, time: '10:20-11:10' },
             { number: 3, time: '11:10-12:00' }, { number: 4, time: '12:00-12:50' },

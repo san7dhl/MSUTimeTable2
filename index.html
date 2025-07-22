@@ -821,7 +821,24 @@
                     setTimeout(() => isUserInteracting = false, 100); // Reset after a short delay
                 }
             };
+            dom.parentProgramDisplay.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetLink = e.target.closest('a[data-program-name]');
+                if (!targetLink) return;
 
+                const programNameToSelect = targetLink.dataset.programName;
+                const targetProgram = DB.programs.find(p => p.programName === programNameToSelect);
+
+                if (targetProgram) {
+                    isUserInteracting = true;
+                    // Set the department and program dropdowns to the parent's values
+                    dom.departmentSelect.value = targetProgram.departmentName;
+                    handleDepartmentChange(); // This will rebuild the program list
+                    dom.programSelect.value = programNameToSelect;
+                    handleProgramChange(); // This will update the view for the selected parent program
+                    setTimeout(() => isUserInteracting = false, 100);
+                }
+            });
             dom.departmentSelect.addEventListener('change', handleUserInteraction(handleDepartmentChange));
             dom.programSelect.addEventListener('change', handleUserInteraction(handleProgramChange));
             dom.facultySelect.addEventListener('change', handleUserInteraction(handleFacultyChange));
@@ -1058,13 +1075,18 @@
             dom.semesterButtons.innerHTML = '';
             const parentDisplay = dom.parentProgramDisplay;
 
+            
             if (program && program.parentPrograms && program.parentPrograms.length > 0) {
                 parentDisplay.innerHTML = `
                     <div class="p-2 bg-slate-900/50 rounded-md border border-white/10">
-                        <span class="font-semibold text-gray-300">Common Schedule With:</span>
-                        <ul class="list-disc list-inside text-gray-400 mt-1 pl-2">
-                            ${program.parentPrograms.map(p => `<li>${p}</li>`).join('')}
-                        </ul>
+                        <span class="font-semibold text-gray-300">Schedule shared classes via parent:</span>
+                        <div class="mt-1 space-y-1">
+                            ${program.parentPrograms.map(p => `
+                                <a href="#" class="block text-cyan-400 hover:underline" data-program-name="${p}">
+                                    ↳ ${p}
+                                </a>
+                            `).join('')}
+                        </div>
                     </div>
                 `;
                 parentDisplay.classList.remove('hidden');

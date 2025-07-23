@@ -214,7 +214,6 @@
     </style>
 </head>
 <body class="text-gray-200">
-
     <div id="loader" class="loader hidden"></div>
     <div id="hover-tooltip" class="hidden absolute px-3 py-1 text-white text-sm rounded-lg shadow-lg z-50"></div>
 
@@ -226,8 +225,8 @@
                   <p>Workspace ID: <span id="user-id-display" class="font-mono"></span></p>
                   <div class="mt-4 flex justify-center items-center space-x-4">
                        <button id="share-btn" class="px-4 py-2 bg-white/10 rounded-lg hover:bg-white/20 transition" title="Share a link to this workspace for collaboration">Share Workspace</button>
-                       <button id="export-timetable-workbook-btn" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors flex-shrink-0" title="Export all program timetables to an Excel workbook">Export Timetables</button>
-                       <button id="export-faculty-workbook-btn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex-shrink-0" title="Export all faculty schedules to an Excel workbook">Export Faculty Schedules</button>
+                        <button id="export-timetable-workbook-btn" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors flex-shrink-0" title="Export all program timetables to an Excel workbook">Export Timetables</button>
+                        <button id="export-faculty-workbook-btn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex-shrink-0" title="Export all faculty schedules to an Excel workbook">Export Faculty Schedules</button>
                   </div>
              </div>
         </header>
@@ -291,7 +290,7 @@
                 <div id="individual-edit-view">
                     <p class="text-gray-300 mb-6">Add, edit, or delete programs, faculty, and courses directly.</p>
                     <div class="space-y-12">
-                       <div class="mb-12">
+                        <div class="mb-12">
                             <div class="flex justify-between items-center mb-3">
                                 <h3 class="text-lg font-medium text-white">Programs</h3>
                                 <button id="add-program-btn" class="px-3 py-1.5 bg-[--main-color] text-white text-sm rounded-lg hover:bg-cyan-700 transition-colors flex items-center gap-2" title="Add a new academic program">
@@ -301,8 +300,8 @@
                             </div>
                             <input type="text" id="program-search-input" placeholder="Search programs..." class="w-full mb-3 px-3 py-2 rounded-md">
                             <div id="program-management-list" class="space-y-2 max-h-96 overflow-y-auto p-1"></div>
-                       </div>
-                       <div class="mb-12">
+                        </div>
+                        <div class="mb-12">
                             <div class="flex justify-between items-center mb-3">
                                 <h3 class="text-lg font-medium text-white">Faculty Members</h3>
                                 <button id="add-faculty-btn" class="px-3 py-1.5 bg-[--main-color] text-white text-sm rounded-lg hover:bg-cyan-700 transition-colors flex items-center gap-2" title="Add a new faculty member">
@@ -312,8 +311,8 @@
                             </div>
                             <input type="text" id="faculty-search-input" placeholder="Search faculty..." class="w-full mb-3 px-3 py-2 rounded-md">
                             <div id="faculty-management-list" class="space-y-2 max-h-96 overflow-y-auto p-1"></div>
-                       </div>
-                       <div>
+                        </div>
+                        <div>
                             <div class="flex justify-between items-center mb-3">
                                 <h3 class="text-lg font-medium text-white">Courses</h3>
                                  <button id="add-course-btn" class="px-3 py-1.5 bg-[--main-color] text-white text-sm rounded-lg hover:bg-cyan-700 transition-colors flex items-center gap-2" title="Add a new course">
@@ -323,7 +322,7 @@
                             </div>
                             <input type="text" id="course-search-input" placeholder="Search courses..." class="w-full mb-3 px-3 py-2 rounded-md">
                             <div id="course-management-list" class="space-y-2 max-h-96 overflow-y-auto p-1"></div>
-                       </div>
+                        </div>
                     </div>
                 </div>
 
@@ -751,7 +750,6 @@
             if (unsubscribe) unsubscribe();
 
             unsubscribe = onSnapshot(dbRef, (docSnap) => {
-                // BUG FIX: Store current selections to prevent them from being reset by re-renders.
                 const activeSelections = {
                     department: dom.departmentSelect.value,
                     program: dom.programSelect.value,
@@ -768,7 +766,7 @@
                     DB = { departments: [], programs: [], faculty: [], courses: [], schedule: {}, workloadLimit: 20 };
                 }
 
-                buildFacultyScheduleMap(); // Performance Fix: Rebuild the map on any data change.
+                buildFacultyScheduleMap();
                 
                 if (!isUserInteracting) {
                     renderAll(activeSelections);
@@ -801,16 +799,16 @@
             document.getElementById('share-btn').addEventListener('click', () => {
                  const shareUrl = window.location.href;
                  Swal.fire({
-                         title: 'Share Workspace',
-                         html: `Share this URL with your colleagues to collaborate:<br><br><input type="text" value="${shareUrl}" class="swal2-input" readonly>`,
-                         confirmButtonText: 'Copy URL'
+                       title: 'Share Workspace',
+                       html: `Share this URL with your colleagues to collaborate:<br><br><input type="text" value="${shareUrl}" class="swal2-input" readonly>`,
+                       confirmButtonText: 'Copy URL'
                  }).then((result) => {
-                         if(result.isConfirmed) {
-                             const input = Swal.getPopup().querySelector('input');
-                             input.select();
-                             document.execCommand('copy');
-                             Swal.fire('Copied!', 'Shareable URL copied to clipboard.', 'success');
-                         }
+                       if(result.isConfirmed) {
+                           const input = Swal.getPopup().querySelector('input');
+                           input.select();
+                           document.execCommand('copy');
+                           Swal.fire('Copied!', 'Shareable URL copied to clipboard.', 'success');
+                       }
                  });
             });
             
@@ -818,7 +816,7 @@
                 return (...args) => {
                     isUserInteracting = true;
                     callback(...args);
-                    setTimeout(() => isUserInteracting = false, 100); // Reset after a short delay
+                    setTimeout(() => isUserInteracting = false, 100);
                 }
             };
             dom.parentProgramDisplay.addEventListener('click', (e) => {
@@ -831,11 +829,10 @@
 
                 if (targetProgram) {
                     isUserInteracting = true;
-                    // Set the department and program dropdowns to the parent's values
                     dom.departmentSelect.value = targetProgram.departmentName;
-                    handleDepartmentChange(); // This will rebuild the program list
+                    handleDepartmentChange();
                     dom.programSelect.value = programNameToSelect;
-                    handleProgramChange(); // This will update the view for the selected parent program
+                    handleProgramChange();
                     setTimeout(() => isUserInteracting = false, 100);
                 }
             });
@@ -890,7 +887,6 @@
                 }
             });
             
-            // Close dropdown if clicked outside
             document.addEventListener('click', (e) => {
                 if (!helpMenuButton.contains(e.target) && !helpMenuDropdown.contains(e.target)) {
                     helpMenuDropdown.classList.add('hidden');
@@ -953,33 +949,25 @@
             }
         }
         
-        // --- MODIFICATION: Replaced the previous hierarchical function with a more robust version ---
         function populateHierarchicalProgramSelect(programsInDept, selectedValue) {
             const selectElement = dom.programSelect;
             selectElement.innerHTML = '';
 
-            if (!programsInDept || programsInDept.length === 0) {
-                return;
-            }
+            if (!programsInDept || programsInDept.length === 0) return;
 
             const allPrograms = DB.programs;
             const programObjectsInDept = allPrograms.filter(p => programsInDept.includes(p.programName));
 
-            // Create a map of parent -> children[] for all programs
             const childrenMap = new Map();
             allPrograms.forEach(p => {
                 if (p.parentPrograms && p.parentPrograms.length > 0) {
                     p.parentPrograms.forEach(parentName => {
-                        if (!childrenMap.has(parentName)) {
-                            childrenMap.set(parentName, []);
-                        }
+                        if (!childrenMap.has(parentName)) childrenMap.set(parentName, []);
                         childrenMap.get(parentName).push(p.programName);
                     });
                 }
             });
 
-            // Identify top-level programs for the current department
-            // A program is top-level if it's a parent OR if it's not a child of any other program.
             const topLevelProgramsInDept = programObjectsInDept
                 .filter(p => {
                     const isParent = childrenMap.has(p.programName);
@@ -988,9 +976,8 @@
                 })
                 .sort((a, b) => a.programName.localeCompare(b.programName));
 
-            const addedPrograms = new Set(); // Keep track of programs added to avoid duplicates from multiple parents
+            const addedPrograms = new Set(); 
 
-            // Recursive function to add options to the select element
             const addOption = (program, depth) => {
                 if (depth === 0) {
                     if (addedPrograms.has(program.programName)) return;
@@ -1001,21 +988,18 @@
                 opt.value = program.programName;
 
                 let label = ' '.repeat(depth * 4);
-                if (depth > 0) {
-                    label += '↳ '; // Indentation for children
-                }
+                if (depth > 0) label += '↳ ';
                 label += program.programName;
 
                 if (childrenMap.has(program.programName)) {
                     opt.style.fontWeight = 'bold';
-                    opt.style.color = '#a78bfa'; // Highlight parents
+                    opt.style.color = '#a78bfa';
                     label += ' (Parent)';
                 }
 
                 opt.innerHTML = label.replace(/ /g, '&nbsp;');
                 selectElement.appendChild(opt);
 
-                // Find and add children that are in the current department
                 const childrenNames = (childrenMap.get(program.programName) || []).sort();
                 childrenNames.forEach(childName => {
                     const childProgram = allPrograms.find(p => p.programName === childName);
@@ -1025,17 +1009,14 @@
                 });
             };
 
-            // Build the dropdown from the top-level programs
             topLevelProgramsInDept.forEach(p => addOption(p, 0));
 
-            // Set the selected value
             if (selectedValue && programsInDept.includes(selectedValue)) {
                 selectElement.value = selectedValue;
             } else if (topLevelProgramsInDept.length > 0) {
                 selectElement.value = topLevelProgramsInDept[0].programName;
             }
         }
-        // --- END MODIFICATION ---
 
         function renderGroupView(initialDept, initialProg, initialSem) {
             if (DB.programs.length === 0) return;
@@ -1049,7 +1030,6 @@
             
             const progToSelect = initialProg || selectedGroup.program || (programsInDept[0] || null);
             
-            // Use the new hierarchical function to populate the dropdown
             populateHierarchicalProgramSelect(programsInDept, progToSelect);
             
             selectedGroup.department = dom.departmentSelect.value;
@@ -1061,13 +1041,13 @@
         function handleDepartmentChange() {
             selectCourse(null);
             selectedGroup.department = dom.departmentSelect.value;
-            renderGroupView(selectedGroup.department); // Re-render with the new selection
+            renderGroupView(selectedGroup.department);
         }
 
         function handleProgramChange() {
             selectCourse(null);
             selectedGroup.program = dom.programSelect.value;
-            updateSemesterButtons(); // Update semesters for the new program
+            updateSemesterButtons();
         }
 
         function updateSemesterButtons(initialSem = null) {
@@ -1313,8 +1293,8 @@
 
         function renderFacultyView(initialFaculty = null) {
              const facultyOptions = DB.faculty.map(f => ({
-                  text: `${f.facultyName} (${f.departmentName})`,
-                  value: f.facultyName
+                 text: `${f.facultyName} (${f.departmentName})`,
+                 value: f.facultyName
              })).sort((a, b) => a.text.localeCompare(b.text));
             
             const facultyToSelect = initialFaculty || selectedFaculty.name || (facultyOptions[0]?.value || null);
@@ -1605,7 +1585,6 @@
             const { programs, faculty } = getTempBulkData();
             const row = document.createElement('div');
             row.className = 'bulk-form-row';
-            // BUG FIX: Adjusted grid columns to prevent the remove button from wrapping
             row.style.gridTemplateColumns = '3fr 1fr 4fr 1.5fr 1fr 3fr auto';
             row.innerHTML = `
                 <select class="p-2 text-sm">${programs.map(p => `<option value="${p}" ${p === data.programName ? 'selected' : ''}>${p}</option>`).join('')}</select>
@@ -1790,7 +1769,6 @@
                     const nameToDelete = program.programName;
                     const semestersToDelete = program.semesters;
                     
-                    // BUG FIX: More efficient and direct deletion of schedule entries.
                     for(let i = 1; i <= semestersToDelete; i++) {
                         const scheduleKey = `${nameToDelete}_${i}`;
                         if(DB.schedule[scheduleKey]) {
@@ -2234,6 +2212,8 @@
                     const programsData = XLSX.utils.sheet_to_json(workbook.Sheets['Programs'] || []);
                     const coursesData = XLSX.utils.sheet_to_json(workbook.Sheets['Courses'] || []);
                     const facultyData = XLSX.utils.sheet_to_json(workbook.Sheets['Faculty'] || []);
+                    // UPDATED: Read schedule data
+                    const scheduleData = XLSX.utils.sheet_to_json(workbook.Sheets['Schedule'] || []);
 
                     const errors = [];
                     const warnings = [];
@@ -2259,16 +2239,36 @@
                         }
                     });
 
+                    // UPDATED: Add validation for schedule data
+                    if (scheduleData.length > 0) {
+                        warnings.push(`Found ${scheduleData.length} schedule entries. Importing this will overwrite any existing schedule in this workspace.`);
+                        scheduleData.forEach((entry, index) => {
+                            if (!programNames.has(entry.programName?.trim())) {
+                                errors.push(`Schedule Sheet, Row ${index + 2}: Program "${entry.programName}" does not exist in the Programs sheet.`);
+                            }
+                            if (entry.facultyName?.trim() !== 'Unassigned' && !facultyNames.has(entry.facultyName?.trim())) {
+                                errors.push(`Schedule Sheet, Row ${index + 2}: Faculty "${entry.facultyName}" does not exist in the Faculty sheet.`);
+                            }
+                            const courseExists = coursesData.some(c => 
+                                c.programName === entry.programName && c.semester == entry.semester &&
+                                c.courseName === entry.courseName && c.facultyName === entry.facultyName
+                            );
+                            if (!courseExists) {
+                                errors.push(`Schedule Sheet, Row ${index + 2}: Course "${entry.courseName}" for Program "${entry.programName}" (Sem ${entry.semester}) taught by "${entry.facultyName}" does not exist in the Courses sheet.`);
+                            }
+                        });
+                    }
+
                     let html = `<div class="text-left">
-                                     <p class="text-lg font-semibold mb-4">Found: ${programsData.length} Programs, ${facultyData.length} Faculty, ${coursesData.length} Courses.</p>`;
+                                         <p class="text-lg font-semibold mb-4">Found: ${programsData.length} Programs, ${facultyData.length} Faculty, ${coursesData.length} Courses, and ${scheduleData.length} Schedule Entries.</p>`;
 
                     if (errors.length > 0) {
                         html += `<h4 class="font-bold text-red-400 mt-4">Errors (must be fixed before import):</h4>
-                                     <ul class="list-disc list-inside text-sm text-red-400">${errors.map(e => `<li>${e}</li>`).join('')}</ul>`;
+                                         <ul class="list-disc list-inside text-sm text-red-400">${errors.map(e => `<li>${e}</li>`).join('')}</ul>`;
                     }
                     if (warnings.length > 0) {
-                        html += `<h4 class="font-bold text-yellow-400 mt-4">Warnings (will use default values):</h4>
-                                     <ul class="list-disc list-inside text-sm text-yellow-400">${warnings.map(w => `<li>${w}</li>`).join('')}</ul>`;
+                        html += `<h4 class="font-bold text-yellow-400 mt-4">Warnings:</h4>
+                                         <ul class="list-disc list-inside text-sm text-yellow-400">${warnings.map(w => `<li>${w}</li>`).join('')}</ul>`;
                     }
                     if (errors.length === 0 && warnings.length === 0) {
                         html += `<p class="text-green-400 mt-4">No issues found. Ready to import.</p>`;
@@ -2288,7 +2288,7 @@
                                 Swal.showValidationMessage('Please fix the errors in your Excel file before importing.');
                                 return false;
                             }
-                            return { programsData, coursesData, facultyData };
+                            return { programsData, coursesData, facultyData, scheduleData };
                         },
                         allowOutsideClick: () => !Swal.isLoading()
                     }).then((result) => {
@@ -2301,14 +2301,15 @@
                     Swal.fire('Import Failed', `An error occurred while reading the file: ${error.message}`, 'error');
                 } finally {
                     dom.loader.classList.add('hidden');
-                    document.getElementById('excel-file-input').value = ''; // Reset file input
+                    document.getElementById('excel-file-input').value = '';
                 }
             };
             reader.readAsArrayBuffer(file);
         }
 
         function performImport(data) {
-            const { programsData, coursesData, facultyData } = data;
+            // UPDATED: Destructure scheduleData
+            const { programsData, coursesData, facultyData, scheduleData } = data;
             const oldLimit = DB.workloadLimit || 20;
             const newDB = { departments: [], programs: [], faculty: [], courses: [], schedule: {}, workloadLimit: oldLimit };
             
@@ -2334,11 +2335,36 @@
                 facultyName: String(row.facultyName || 'Unassigned').trim()
             })).filter(c => c.programName && c.courseName);
 
+            // UPDATED: Reconstruct the schedule
+            if (scheduleData && scheduleData.length > 0) {
+                scheduleData.forEach(entry => {
+                    const correspondingCourse = newDB.courses.find(c => 
+                        c.programName === entry.programName &&
+                        c.semester == entry.semester &&
+                        c.courseName === entry.courseName &&
+                        c.facultyName === entry.facultyName &&
+                        c.courseType === entry.courseType
+                    );
+
+                    if (correspondingCourse) {
+                        const scheduleKey = `${entry.programName}_${entry.semester}`;
+                        if (!newDB.schedule[scheduleKey]) {
+                            newDB.schedule[scheduleKey] = {};
+                        }
+                        const slotKey = `${entry.day}_${entry.period}`;
+                        newDB.schedule[scheduleKey][slotKey] = {
+                            course: correspondingCourse,
+                            facultyName: entry.facultyName
+                        };
+                    }
+                });
+            }
+
             DB = newDB;
             saveState();
             
             Swal.fire({
-                icon: 'success', title: 'Import Successful!', html: `Your data has been loaded.`
+                icon: 'success', title: 'Import Successful!', html: `Your data and schedule have been loaded.`
             }).then(() => {
                 selectedGroup = { program: null, semester: null, department: null };
                 selectedFaculty = { name: null };
@@ -2364,7 +2390,32 @@
             const facultySheet = XLSX.utils.json_to_sheet(DB.faculty);
             XLSX.utils.book_append_sheet(wb, facultySheet, "Faculty");
 
-            XLSX.writeFile(wb, "Timetable_Current_Data.xlsx");
+            // UPDATED: Add the schedule sheet to the export
+            const scheduleData = [];
+            for (const progSemKey in DB.schedule) {
+                const [programName, semester] = progSemKey.split('_');
+                for (const slotKey in DB.schedule[progSemKey]) {
+                    const [day, period] = slotKey.split('_');
+                    const slotData = DB.schedule[progSemKey][slotKey];
+                    if (slotData && slotData.course) {
+                        scheduleData.push({
+                            programName: programName,
+                            semester: parseInt(semester),
+                            day: day,
+                            period: parseInt(period),
+                            courseName: slotData.course.courseName,
+                            facultyName: slotData.facultyName,
+                            courseType: slotData.course.courseType
+                        });
+                    }
+                }
+            }
+            if (scheduleData.length > 0) {
+                const scheduleSheet = XLSX.utils.json_to_sheet(scheduleData);
+                XLSX.utils.book_append_sheet(wb, scheduleSheet, "Schedule");
+            }
+
+            XLSX.writeFile(wb, "Timetable_Workspace_Backup.xlsx");
         }
 
         function populateSelect(selectElement, options, isObject = false, selectedValue = null) {
@@ -2712,7 +2763,6 @@
             const validProgramNames = new Set(DB.programs.map(p => p.programName));
             const validFacultyNames = new Set(DB.faculty.map(f => f.facultyName));
 
-            // Check for orphaned and unassigned courses
             DB.courses.forEach(course => {
                 if (!validProgramNames.has(course.programName)) {
                     results.orphanedCourses.push(`'${course.courseName}' is assigned to a non-existent program: '${course.programName}'.`);
@@ -2727,7 +2777,6 @@
                 }
             });
 
-            // Check faculty workload
             const facultyWorkloads = {};
             DB.faculty.forEach(f => facultyWorkloads[f.facultyName] = 0);
             Object.values(DB.schedule).forEach(progSched => {
@@ -2748,7 +2797,6 @@
                 }
             });
             
-            // Check for typos
             results.similarFaculty = findSimilarNames(Array.from(validFacultyNames));
             results.similarPrograms = findSimilarNames(Array.from(validProgramNames));
 
@@ -2802,7 +2850,6 @@
         function downloadSmartTemplate() {
             const wb = XLSX.utils.book_new();
 
-            // Create sheets with headers and example data
             const programsData = [{ programName: "B.Tech CSE", departmentName: "Engineering", semesters: 8, parentPrograms: "" }];
             const facultyData = [{ facultyName: "Dr. Alan Turing", departmentName: "Engineering", workloadLimit: 20 }];
             const coursesData = [{ programName: "B.Tech CSE", semester: 1, courseName: "Intro to Programming", courseType: "Theory", periodsPerWeek: 4, facultyName: "Dr. Alan Turing" }];
@@ -2811,14 +2858,9 @@
             const wsFaculty = XLSX.utils.json_to_sheet(facultyData);
             const wsCourses = XLSX.utils.json_to_sheet(coursesData);
 
-            // Add sheets to workbook
             XLSX.utils.book_append_sheet(wb, wsPrograms, "Programs");
             XLSX.utils.book_append_sheet(wb, wsFaculty, "Faculty");
             XLSX.utils.book_append_sheet(wb, wsCourses, "Courses");
-            
-            // BUG FIX: The original data validation feature is unreliable in many Excel versions.
-            // This simplified template provides the correct structure without the faulty validation.
-            // The in-app Health Check tool is a more reliable way to validate data.
             
             XLSX.writeFile(wb, "Timetable_Template.xlsx");
         }
